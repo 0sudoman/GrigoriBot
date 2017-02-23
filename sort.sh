@@ -5,13 +5,12 @@
 source config.sh
 echo "$( date ): sort.sh run" >> $LOGFILE
 
-DIR=$1
-FORCE=false
-CHECK=false
-IRCOUT=false
-TRANSFER=true
-VERIFY=true
-RELEASE=false
+DIR="$1"
+FORCE="false"
+CHECK="false"
+IRCOUT="true"
+TRANSFER="true"
+VERIFY="true"
 
 IN="/data/Public/Seeds"
 OUT="/data/Public/TV"
@@ -21,6 +20,7 @@ SEASON="UNKNOWN"
 EPISODE="UNKNOWN"
 QUALITY="UNKNOWN"
 TYPE="UNKNOWN"
+EXIT="false"
 
 # determine show name
 #  sorted by air date
@@ -91,19 +91,20 @@ if [[ -n $( find "$IN/$DIR" -name *.rar ) ]]; then TYPE="rar"; fi;
 TARGET="$OUT/$SHOW/Season $SEASON/"
 
 # see if assumptions make sense
-OUTPUT="Transferring $SHOW S$SEASON E$EPISODE $QUALITY to $TARGET"
+OUTPUT="Transferring $SHOW S$SEASON E$EPISODE $QUALITY"
 if [ $FORCE == false ]; then
   if [ "$SHOW" == "UNKNOWN" ] || [ $SEASON == "UNKNOWN" ] || [ $EPISODE == "UNKNOWN" ] || [ $TYPE == "UNKNOWN" ]; then 
     OUTPUT="Cannot find necessary data. Are you sure you entered a valid folder?"
-    exit
+    EXIT="true"
   fi
-  if [[ -n $( find "$TARGET" -name *E$EPISODE* ) ]]; then
+  if [[ -n $( find "$TARGET" -name *[Ee]$EPISODE* ) ]]; then
     OUTPUT="Target file already exists."
-    exit
+    EXIT="true"
   fi
 fi
 echo "$( date ): $OUTPUT" >> $LOGFILE
 if [ $IRCOUT == true ]; then echo $OUTPUT > $IRC/in; fi
+if [ $EXIT == true ]; then exit; fi
 
 # ask for verification
 if [ $CHECK == true ]; then
@@ -126,27 +127,13 @@ fi
 
 # verify file was copied
 if [ $VERIFY == true ]; then
-  if [[ -n $( find "$TARGET" -name *E$EPISODE* ) ]]; then
+  if [[ -n $( find "$TARGET" -name *[Ee]$EPISODE* ) ]]; then
     OUTPUT="Transfer successful."
   else
     OUTPUT="Transfer failed."
   fi
   echo "$( date ): $OUTPUT" >> $LOGFILE
   if [ $IRCOUT == true ]; then echo $OUTPUT > $IRC/in; fi
-fi
-
-# send to irc
-#  currently unused
-if [ $RELEASE == true ]; then
-  echo "Send to IRC?"
-  while true; do
-    read yn
-    case $yn in
-      [Yy]* ) echo "!add tv-hd $DIR" > $IRC/in; break;;
-      [Nn]* ) exit;;
-      * ) echo "Please answer yes or no.";;
-    esac
-  done
 fi
 
 exit

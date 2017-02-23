@@ -15,7 +15,7 @@ LINE="$NEW"
 if [[ "$LINE" =~ "> !source" ]]; then echo "https://github.com/0sudoman/GrigoriBot" > $IRC/in; fi
 
 # admin commands
-if [[ "$LINE" =~ ^.{17}"<$ADMIN> !sort" ]]; then echo "lolno" > $IRC/in ; fi
+if [[ "$LINE" =~ ^.{17}"<$ADMIN> !sort "(.*) ]]; then ./sort.sh "${BASH_REMATCH[1]}"; fi
 if [[ "$LINE" =~ ^.{17}"<$ADMIN> !reconnect" ]]; then echo "Restarting IRC interface." > $IRC/in; ./reconnect.sh; fi
 if [[ "$LINE" =~ ^.{17}"<$ADMIN> !shutdown" ]]; then echo "Shutting down all systems." > $IRC/in; ./shutdown.sh; fi
 
