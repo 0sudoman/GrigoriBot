@@ -12,7 +12,7 @@ if [ "$LINE" != "$NEW" ]; then
 LINE="$NEW"
 
 # public commands
-if [[ "$LINE" =~ "> !source" ]]; then echo "lolno" > $IRC/in; fi
+if [[ "$LINE" =~ "> !source" ]]; then echo "https://github.com/0sudoman/GrigoriBot" > $IRC/in; fi
 
 # admin commands
 if [[ "$LINE" =~ ^.{17}"<$ADMIN> !sort" ]]; then echo "lolno" > $IRC/in ; fi
