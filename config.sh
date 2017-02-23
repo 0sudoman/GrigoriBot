@@ -3,6 +3,11 @@
 # stores all settings
 
 LOGFILE="logs/latest.log"
+if [[ ! -f $LOGFILE ]]; then
+  mkdir "logs"
+  LOGFILE="logs/latest.log"
+  echo "$( date ): Log file not found. Resetting to default." >> $LOGFILE
+fi
 
 # IRC SETTINGS
 IIDIR="/home/justin/irc"  #the directory where ii is located
