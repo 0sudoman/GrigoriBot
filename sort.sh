@@ -12,9 +12,6 @@ IRCOUT="true"
 TRANSFER="true"
 VERIFY="true"
 
-IN="/data/Public/Seeds"
-OUT="/data/Public/TV"
-
 SHOW="UNKNOWN"
 SEASON="UNKNOWN"
 EPISODE="UNKNOWN"
@@ -84,11 +81,11 @@ if [[ $DIR =~ "720p" ]]; then QUALITY="720p"; fi
 if [[ $DIR =~ "1080p" ]]; then QUALITY="1080p"; fi;
 
 # determine filetype
-if [[ -n $( find "$IN/$DIR" -name *.mkv ) ]]; then TYPE="mkv"; fi;
-if [[ -n $( find "$IN/$DIR" -name *.rar ) ]]; then TYPE="rar"; fi;
+if [[ -n $( find "$FIN/$DIR" -name *.mkv ) ]]; then TYPE="mkv"; fi;
+if [[ -n $( find "$FIN/$DIR" -name *.rar ) ]]; then TYPE="rar"; fi;
 
 # concatenate target directory
-TARGET="$OUT/$SHOW/Season $SEASON/"
+TARGET="$FOUT/$SHOW/Season $SEASON/"
 
 # see if assumptions make sense
 OUTPUT="Transferring $SHOW S$SEASON E$EPISODE $QUALITY"
@@ -121,8 +118,8 @@ fi
 
 # extract/copy as needed
 if [ $TRANSFER == true ]; then
-  if [ $TYPE == mkv ]; then cp "$IN/$DIR/*.mkv" "$TARGET"; fi
-  if [ $TYPE == rar ]; then unrar e "$IN/$DIR/*.rar" "$TARGET"; fi
+  if [ $TYPE == mkv ]; then cp "$FIN/$DIR/*.mkv" "$TARGET"; fi
+  if [ $TYPE == rar ]; then unrar e "$FIN/$DIR/*.rar" "$TARGET"; fi
 fi
 
 # verify file was copied

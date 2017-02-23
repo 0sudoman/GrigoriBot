@@ -2,6 +2,7 @@
 # config.sh
 # stores all settings
 
+# LOG SETTINGS
 LOGFILE="logs/latest.log"
 if [[ ! -f $LOGFILE ]]; then
   mkdir "logs"
@@ -18,3 +19,8 @@ ADMIN="FatherGrigori"     #the nick of the owner
 JOINDELAY="10"            #the delay between sending /j messages (higher numbers reduce flooding)
 
 IRC="$IIDIR/$SERVER/$CHANNEL"
+
+# FILE SETTINGS
+FIN="/data/Public/Seeds"
+FOUT="/data/Public/TV"
+
