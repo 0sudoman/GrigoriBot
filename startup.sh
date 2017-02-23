@@ -6,5 +6,5 @@ source config.sh
 echo "$( date ): startup.sh run" >> $LOGFILE
 
 ./ii.sh
-screen -dm -S rejoin ./rejoin.sh
+screen -dm -S rejoiner ./rejoiner.sh
 screen -dm -S bot ./bot.sh
