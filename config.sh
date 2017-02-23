@@ -17,4 +17,4 @@ BOTNICK="GrigoriBot"      #the nick of the bot
 ADMIN="FatherGrigori"     #the nick of the owner
 JOINDELAY="10"            #the delay between sending /j messages (higher numbers reduce flooding)
 
-IRC="$IIDIR/$SERVER/#CHANNEL"
+IRC="$IIDIR/$SERVER/#$CHANNEL"
