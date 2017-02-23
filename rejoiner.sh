@@ -7,7 +7,7 @@ echo "$( date ): rejoiner.sh started" >> $LOGFILE
 
 while true; do
 
-echo "/j $CHANNEL" > $IRC/in
+echo "/j $CHANNEL" > $IIDIR/$SERVER/in
 sleep $JOINDELAY
 
 done
