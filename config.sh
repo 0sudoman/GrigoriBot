@@ -4,6 +4,7 @@
 
 # LOG SETTINGS
 LOGFILE="logs/latest.log"
+
 if [[ ! -f $LOGFILE ]]; then
   mkdir "logs"
   LOGFILE="logs/latest.log"
