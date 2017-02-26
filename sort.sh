@@ -71,14 +71,16 @@ if [ $VERIFY == true ]; then
     OUTPUT="Transfer successful."
   else
     OUTPUT="Transfer failed."
+    EXIT="true"
   fi
   echo "$( date ): $OUTPUT" >> $LOGFILE
   if [ $IRCOUT == true ]; then echo $OUTPUT > $IRC/in; fi
+  if [ $EXIT == true ]; then exit; fi
 fi
 
 # send to discord
 if [ $DCOUT == true ]; then
-  if [ $OUTPUT =~ "success" ]; then
-    echo "New in TV: $SHOW S${SEASON}E${EPISODE}" >> todiscord
+  echo "New in TV: $SHOW S${SEASON}E${EPISODE}" >> todiscord
+fi
 
 exit
