@@ -1,4 +1,4 @@
-*GrigoriBot*
+**GrigoriBot**
 
 This bot was designed to simplify the sorting process for new TV shows.
 Its main purpose is to take a directory name from IRC (or bash), then automaticially sort it into the appropiate show/season folder.
