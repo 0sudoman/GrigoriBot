@@ -7,7 +7,6 @@ echo "$( date ): sort.sh run" >> $LOGFILE
 
 DIR="$1"
 FORCE="false"
-CHECK="false"
 IRCOUT="true"
 TRANSFER="true"
 VERIFY="true"
@@ -30,8 +29,8 @@ for SHOW in $FOUT/*; do
 done
 
 # determine season / episode
-for i in $( seq -w 30 ); do if [[ "$DIR" =~ .*S$i.* ]]; then SEASON="$i"; fi; done
-for i in $( seq -w 30 ); do if [[ "$DIR" =~ .*E$i.* ]]; then EPISODE="$i"; fi; done
+for i in $( seq -w 30 ); do if [[ "$DIR" =~ .*[Ss]$i.* ]]; then SEASON="$i"; fi; done
+for i in $( seq -w 30 ); do if [[ "$DIR" =~ .*[Ee]$i.* ]]; then EPISODE="$i"; fi; done
 
 # determine quality
 if [[ $DIR =~ "HDTV" ]]; then QUALITY="SD"; fi
@@ -48,31 +47,16 @@ TARGET="$FOUT/$SHOW/Season $SEASON/"
 # see if assumptions make sense
 OUTPUT="Transferring $SHOW S$SEASON E$EPISODE $QUALITY"
 if [ $FORCE == false ]; then
-  if [ "$SHOW" == "UNKNOWN" ] || [ $SEASON == "UNKNOWN" ] || [ $EPISODE == "UNKNOWN" ] || [ $TYPE == "UNKNOWN" ]; then 
-    OUTPUT="Cannot find necessary data. Are you sure you entered a valid folder?"
-    EXIT="true"
+  if [ "$SHOW" == "UNKNOWN" ] || [ $SEASON == "UNKNOWN" ] || [ $EPISODE == "UNKNOWN" ] || [ $TYPE == "UNKNOWN" ]; then
+    OUTPUT="Cannot find necessary data. Are you sure you entered a valid folder?" && EXIT="true"
   fi
   if [[ -n $( find "$TARGET" -name *[Ee]$EPISODE* ) ]]; then
-    OUTPUT="Target file already exists."
-    EXIT="true"
+    OUTPUT="Target file already exists." && EXIT="true"
   fi
 fi
 echo "$( date ): $OUTPUT" >> $LOGFILE
 if [ $IRCOUT == true ]; then echo $OUTPUT > $IRC/in; fi
 if [ $EXIT == true ]; then exit; fi
-
-# ask for verification
-if [ $CHECK == true ]; then
-  echo "Transfer to $TARGET ?"
-  while true; do
-    read yn
-    case $yn in
-      [Yy]* ) break;;
-      [Nn]* ) exit;;
-      * ) echo "Please answer yes or no.";;
-    esac
-  done
-fi
 
 # extract/copy as needed
 if [ $TRANSFER == true ]; then
