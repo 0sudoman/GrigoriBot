@@ -1,0 +1,29 @@
+#!/bin/bash
+# config.sh
+# stores all settings
+
+# LOG SETTINGS
+LOGFILE="logs/latest.log"
+
+if [[ ! -f $LOGFILE ]]; then
+  mkdir "logs"
+  LOGFILE="logs/latest.log"
+  echo "$( date ): Log file not found. Resetting to default." >> $LOGFILE
+fi
+
+# IRC SETTINGS
+IIDIR="/home/user/irc"     #the directory where ii is located
+SERVER="irc.freenode.net"  #the server to connect to
+CHANNEL="#test"            #the channel to be active in
+BOTNICK="GrigoriBot"       #the nick of the bot
+ADMIN="owner"              #the nick of the owner
+JOINDELAY="10"             #the delay between sending /j messages (higher numbers reduce flooding)
+
+IRC="$IIDIR/$SERVER/$CHANNEL"
+
+# FILE SETTINGS
+FIN="/mnt/media/torrents"
+FOUT="/mnt/media/shows"
+
+# DISCORD SETTINGS
+TOKEN="token"

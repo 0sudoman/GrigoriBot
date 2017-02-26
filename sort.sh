@@ -8,6 +8,7 @@ echo "$( date ): sort.sh run" >> $LOGFILE
 DIR="$1"
 FORCE="false"
 IRCOUT="true"
+DCOUT="true"
 TRANSFER="true"
 VERIFY="true"
 
@@ -74,5 +75,10 @@ if [ $VERIFY == true ]; then
   echo "$( date ): $OUTPUT" >> $LOGFILE
   if [ $IRCOUT == true ]; then echo $OUTPUT > $IRC/in; fi
 fi
+
+# send to discord
+if [ $DCOUT == true ]; then
+  if [ $OUTPUT =~ "success" ]; then
+    echo "New in TV: $SHOW S${SEASON}E${EPISODE}" >> todiscord
 
 exit
