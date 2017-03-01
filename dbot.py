@@ -15,5 +15,7 @@ async def on_message(message):
         await client.send_message(message.channel, line.rstrip())
       file.close
       os.remove("todiscord")
+  if message.content.startswith('!source'):
+    await client.send_message(message.channel, "https://github.com/0sudoman/GrigoriBot")
 
 client.run(sys.argv[1])
