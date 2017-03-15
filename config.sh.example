@@ -4,12 +4,25 @@
 
 # LOG SETTINGS
 LOGFILE="logs/latest.log"
+SCRIPT="ERROR"
 
 if [[ ! -f $LOGFILE ]]; then
   mkdir "logs"
   LOGFILE="logs/latest.log"
   echo "$( date ): Log file not found. Resetting to default." >> $LOGFILE
 fi
+
+# FUNCTIONS
+sendToLog () {
+  echo "$( date ): $SCRIPT $1" >> $LOGFILE
+}
+sendToIRC () {
+  echo "$1" >> $IRC/in
+  sendToLog "$1"
+}
+sendToDiscord () {
+  echo "$1" >> todiscord
+}
 
 # IRC SETTINGS
 IIDIR="/home/user/irc"     #the directory where ii is located

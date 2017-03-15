@@ -3,7 +3,8 @@
 # keeps the bot joined
 
 source config.sh
-echo "$( date ): rejoiner.sh started" >> $LOGFILE
+SCRIPT="rejoiner.sh"
+sendToLog "Started"
 
 while true; do
 
