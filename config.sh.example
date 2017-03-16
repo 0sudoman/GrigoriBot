@@ -35,10 +35,10 @@ JOINDELAY="10"             #the delay between sending /j messages (higher number
 IRC="$IIDIR/$SERVER/$CHANNEL"
 
 # FILE SETTINGS
-IN="/mnt/media/torrents"
-TVOUT="/mnt/media/tvshows"
-MVOUT="/mnt/media/movies"
-TEMP="/mnt/media/temp"
+IN="/path/to/torrents"
+TVOUT="/path/to/tvshows"
+MVOUT="/path/to/movies"
+TEMP="/some/random/temp/folder"
 
 # DISCORD SETTINGS
 TOKEN="token"
