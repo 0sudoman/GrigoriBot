@@ -40,7 +40,10 @@ if [[ $SORT == "TV" ]]; then
 
   # transfer
   sendToIRC "Transferring $SHOW S${SEASON}E${EPISODE} $QUALITY"
-  if [[ $TYPE == mkv ]]; then cp "$IN/$DIR/*.mkv" "$TARGET"; fi
+  if [[ $TYPE == mkv ]]; then
+    SOURCE="$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
+    cp "$IN/$DIR/$SOURCE" "$TARGET"
+  fi
   if [[ $TYPE == rar ]]; then unrar e "$IN/$DIR/*.rar" "$TARGET"; fi
 
   # verify
