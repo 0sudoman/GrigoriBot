@@ -13,7 +13,8 @@ if [ "$LINE" != "$NEW" ]; then LINE="$NEW"
 
 # public commands
 if [[ "$LINE" =~ "> !source" ]]; then sendToIRC "https://github.com/0sudoman/GrigoriBot"; fi
-if [[ "$LINE" =~ "> ${BOTNICK}++" ]]; then sendToIRC "thx bb"; fi
+if [[ "$LINE" =~ "> ${BOTNICK}++" ]]; then sendToIRC ":D"; fi
+if [[ "$LINE" =~ "> ${BOTNICK}++" ]]; then sendToIRC "D:"; fi
 
 # admin commands
 if [[ "$LINE" =~ ^.{17}"<$ADMIN> !sort "(.*) ]]; then ./sort.sh "${BASH_REMATCH[1]}"; fi
