@@ -17,9 +17,9 @@ for SHOW in $TVOUT/*; do
 done
 
 # determine filetype & quality
-if [[ -n $( find "$IN/$DIR" -name *.mkv ) ]]; then TYPE="mkv";
+if [[ -n $( find "$IN/$DIR" -name *.rar ) ]]; then TYPE="rar";
+elif [[ -n $( find "$IN/$DIR" -name *.mkv ) ]]; then TYPE="mkv";
 elif [[ -n $( find "$IN/$DIR" -name *.mp4 ) ]]; then TYPE="mp4";
-elif [[ -n $( find "$IN/$DIR" -name *.rar ) ]]; then TYPE="rar";
 else sendToIRC "Could not find necessary data [filetype]. Terminating."; exit; fi
 sendToLog "Filetype matched: $TYPE"
 
