@@ -19,7 +19,7 @@ if [[ "$MESSAGE" == "${BOTNICK}--" ]]; then sendToIRC "D:"; fi
 
 # admin commands
 if [[ $SENDER == $ADMIN ]]; then
-if [[ "$MESSAGE" == "!sort (.*)$" ]]; then ./sort.sh "${BASH_REMATCH[1]}"; fi
+if [[ "$MESSAGE" =~ "!sort "(.*) ]]; then ./sort.sh "${BASH_REMATCH[1]}"; fi
 #if [[ "$MESSAGE" == "!reboot" ]]; then sendToIRC "Rebooting all systems."; ./reboot.sh; fi
 if [[ "$MESSAGE" == "!shutdown" ]]; then sendToIRC "Shutting down all systems."; ./shutdown.sh; fi
 fi
