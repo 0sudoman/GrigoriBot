@@ -8,6 +8,7 @@ sendToLog "Started"
 DIR="$1"
 
 # determine show name
+sendToLog "Sorting $DIR"
 for SHOW in $TVOUT/*; do
   if [[ "$SHOW" =~ .{${#TVOUT}}.(.*)$ ]]; then SHOWNAME="${BASH_REMATCH[1]}"; fi
   if [[ "$SHOW" =~ .{${#TVOUT}}.(.{1,13}) ]]; then SHOWMOD="${BASH_REMATCH[1]}"; fi
