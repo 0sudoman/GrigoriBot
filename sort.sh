@@ -6,16 +6,24 @@ source config.sh
 SCRIPT="sort.sh"
 sendToLog "Started"
 DIR="$1"
+SHOW="UNKNOWN"
 
 # determine show name
 sendToLog "Sorting $DIR"
-for SHOW in $TVOUT/*; do
-  if [[ "$SHOW" =~ .{${#TVOUT}}.(.*)$ ]]; then SHOWNAME="${BASH_REMATCH[1]}"; fi
-  if [[ "$SHOW" =~ .{${#TVOUT}}.(.{1,13}) ]]; then SHOWMOD="${BASH_REMATCH[1]}"; fi
+for FILE in $TVOUT/*; do
+  if [[ "$FILE" =~ .{${#TVOUT}}.(.*)$ ]]; then SHOWNAME="${BASH_REMATCH[1]}"; fi
+  if [[ "$FILE" =~ .{${#TVOUT}}.(.{1,13}) ]]; then SHOWMOD="${BASH_REMATCH[1]}"; fi
   for i in $( seq 5 ); do SHOWMOD=${SHOWMOD/\ /\.}; done
   SHOWMOD=${SHOWMOD/\'/} && SHOWMOD=${SHOWMOD/\(/} && SHOWMOD=${SHOWMOD/\)/}
-  if [[ "$DIR" =~ ^"$SHOWMOD" ]]; then SHOW="$SHOWNAME"; SORT="TV"; sendToLog "Show matched: $SHOWNAME"; break; fi
+  if [[ "$DIR" =~ ^"$SHOWMOD" ]]; then SHOW="$SHOWNAME"; break; fi
 done
+if [[ "$SHOW" != "UNKNOWN" ]]; then
+  SORT="TV"
+  sendToLog "Show matched: $SHOWNAME"
+else
+  SORT="Movie"
+  sendToLog "No TV show matched. Assuming it's a movie."
+fi
 
 # determine filetype & quality
 if [[ -n $( find "$IN/$DIR" -name *.rar ) ]]; then TYPE="rar";
@@ -24,7 +32,7 @@ elif [[ -n $( find "$IN/$DIR" -name *.mp4 ) ]]; then TYPE="mp4";
 else sendToIRC "Could not find necessary data [filetype]. Terminating."; exit; fi
 sendToLog "Filetype matched: $TYPE"
 
-if [[ $DIR =~ "DVD[Ss][Cc][Rr]" ]]; then QUALITY="CAM"
+if [[ $DIR =~ "DVD[Ss][Cc][Rr]" ]] || [[ $DIR =~ "HC.HD[Rr][Ii][Pp]" ]]; then QUALITY="CAM"
 elif [[ $DIR =~ "720p" ]]; then QUALITY="720p"
 elif [[ $DIR =~ "1080p" ]]; then QUALITY="1080p"
 else sendToIRC "Could not find necessary data [quality]. Terminating."; exit; fi

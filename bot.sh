@@ -13,6 +13,8 @@ if [ "$LINE" != "$NEW" ]; then LINE="$NEW"
 if [[ "$LINE" =~ ^.{17}\<(.*)\>\ (.*)$ ]]; then SENDER="${BASH_REMATCH[1]}"; MESSAGE="${BASH_REMATCH[2]}"; fi
 
 # public commands
+if [[ "$MESSAGE" == "!help" ]]; then sendToIRC "You can find my docs at "; fi
+
 if [[ "$MESSAGE" == "!source" ]]; then sendToIRC "https://github.com/0sudoman/GrigoriBot"; fi
 if [[ "$MESSAGE" == "${BOTNICK}++" ]]; then sendToIRC ":D"; fi
 if [[ "$MESSAGE" == "${BOTNICK}--" ]]; then sendToIRC "D:"; fi
