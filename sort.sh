@@ -15,7 +15,7 @@ for FILE in $TVOUT/*; do
   if [[ "$FILE" =~ .{${#TVOUT}}.(.{1,13}) ]]; then SHOWMOD="${BASH_REMATCH[1]}"; fi
   for i in $( seq 5 ); do SHOWMOD=${SHOWMOD/\ /\.}; done
   SHOWMOD=${SHOWMOD/\'/} && SHOWMOD=${SHOWMOD/\(/} && SHOWMOD=${SHOWMOD/\)/}
-  if [[ "$DIR" =~ ^"$SHOWMOD" ]]; then SHOW="$SHOWNAME"; break; fi
+  if [[ "${DIR,,}" =~ ^"${SHOWMOD,,}" ]]; then SHOW="$SHOWNAME"; break; fi
 done
 if [[ "$SHOW" != "UNKNOWN" ]]; then
   SORT="TV"
