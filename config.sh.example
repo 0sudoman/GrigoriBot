@@ -1,0 +1,61 @@
+#!/bin/bash
+# config.sh
+# stores all settings
+
+# LOG SETTINGS
+LOGFILE="logs/latest.log"
+SCRIPT="OTHER"
+
+if [[ ! -f $LOGFILE ]]; then
+  mkdir "logs"
+  LOGFILE="logs/latest.log"
+  echo "$( date ): Log file not found. Resetting to default." >> $LOGFILE
+fi
+
+# FUNCTIONS
+sendToLog () {
+  echo "$( date ): $SCRIPT $1" >> $LOGFILE
+}
+sendToIRC () {
+  echo "$1" >> $IRC/in
+  sendToLog "IRC: $1"
+}
+sendToDiscord () {
+  echo "$1" >> todiscord
+}
+botStartup () {
+  sendToLog "Starting Up"
+  screen -dm -S ii ii -s $SERVER -n $BOTNICK
+  screen -dm -S iinterface ./iinterface.sh
+  screen -dm -S dbot python3 ./dbot.py $TOKEN
+}
+botShutdown () {
+  sendToLog "Shutting Down"
+  screen -S iinterface -X kill
+  screen -S ii -X kill
+  screen -S dbot -X kill
+}
+botReboot () {
+  botShutdown
+  sleep 5
+  botStartup
+}
+
+# IRC SETTINGS
+IIDIR="/home/user/irc"     #the directory where ii is located
+SERVER="irc.freenode.net"  #the server to connect to
+CHANNEL="#test"            #the channel to be active in
+BOTNICK="GrigoriBot"       #the nick of the bot
+ADMIN="owner"              #the nick of the owner
+JOINDELAY="10"             #the delay between sending /j messages (higher numbers reduce flooding)
+
+IRC="$IIDIR/$SERVER/$CHANNEL"
+
+# FILE SETTINGS
+IN="/path/to/torrents"
+TVOUT="/path/to/tvshows"
+MVOUT="/path/to/movies"
+TEMP="/some/random/temp/folder"
+
+# DISCORD SETTINGS
+TOKEN="token"
