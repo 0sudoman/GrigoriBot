@@ -51,9 +51,9 @@ elif [[ -n $( find "$IN/$DIR" -name *.mp4 ) ]]; then TYPE="mp4";
 else sendToIRC "Could not find necessary data [filetype]. Terminating."; exit; fi
 sendToLog "Filetype matched: $TYPE"
 
-if [[ $DIR =~ "720p" ]]; then QUALITY="720p"
+if [[ $DIR =~ "DVD[Ss][Cc][Rr]" ]] || [[ $DIR =~ "HC.HD[Rr][Ii][Pp]" ]] || [[ $DIR =~ "TS." ]]; then QUALITY="CAM"
+elif [[ $DIR =~ "720p" ]]; then QUALITY="720p"
 elif [[ $DIR =~ "1080p" ]]; then QUALITY="1080p"
-elif [[ $DIR =~ "DVD[Ss][Cc][Rr]" ]] || [[ $DIR =~ "HC.HD[Rr][Ii][Pp]" ]] || [[ $DIR =~ "TS." ]]; then QUALITY="CAM"
 else sendToIRC "Could not find necessary data [quality]. Terminating."; exit; fi
 sendToLog "Quality matched: $QUALITY"
 
