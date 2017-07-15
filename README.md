@@ -11,6 +11,7 @@ You can easily change this to `tmux` or your multiplexer of choice.
 It uses `ii` to interface with IRC and a tiny script (dbot.py) to interface with Discord.
 That script requires `python3`, `discord.py`, and their dependencies.
 You can easily connect it to any service that interfaces via file structure, like `ii`.
+The fortune command requires `fortune` to be installed. Obviously.
 
 Before running GrigoriBot for the first time, be sure to customize your config.sh script.
 You will need to edit the values, then rename it to config.sh (not config.sh.example).

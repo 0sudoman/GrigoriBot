@@ -15,6 +15,7 @@ if [[ $SENDER != $BOTNICK ]]; then
 # public commands
 if [[ "$MESSAGE" == "!help" ]]; then sendToIRC "You can find my docs at https://github.com/0sudoman/GrigoriBot/blob/master/docs.md"; fi
 if [[ "$MESSAGE" == "!source" ]]; then sendToIRC "https://github.com/0sudoman/GrigoriBot"; fi
+if [[ "$MESSAGE" == "!fortune" ]]; then sendToIRC "$(fortune)"; fi
 if [[ "$MESSAGE" == "${BOTNICK}++" ]]; then sendToIRC ":D"; fi
 if [[ "$MESSAGE" == "${BOTNICK}--" ]]; then sendToIRC "D:"; fi
 

@@ -9,6 +9,7 @@ If you are using GrigoriBot, you may be curious about its features. Below is a l
 
 `!source` will cause the bot to reply with a link to its source.
 
+`!fortune` will print a random fortune from the linux utility `fortune`.
 
 *Admin-Only IRC Commands*
 
