@@ -49,6 +49,7 @@ fi
 if [[ -n $( find "$IN/$DIR" -name *.rar ) ]]; then TYPE="rar";
 elif [[ -n $( find "$IN/$DIR" -name *.mkv ) ]]; then TYPE="mkv";
 elif [[ -n $( find "$IN/$DIR" -name *.mp4 ) ]]; then TYPE="mp4";
+elif [[ -n $( find "$IN/$DIR" -name *.avi ) ]]; then TYPE="avi";
 else sendToIRC "Could not find necessary data [filetype]. Terminating."; exit; fi
 sendToLog "Filetype matched: $TYPE"
 
@@ -74,7 +75,7 @@ if [[ $SORT == "TV" ]]; then
 
   # transfer
   sendToIRC "Transferring $SHOW S${SEASON}E${EPISODE} $QUALITY"
-  if [[ $TYPE == mkv ]] || [[ $TYPE == mp4 ]]; then
+  if [[ $TYPE == mkv ]] || [[ $TYPE == mp4 ]] || [[ $TYPE == avi ]]; then
     SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
     sendToLog "Copying '$SOURCE' to '$TARGET'"
     cp "$SOURCE" "$TARGET"
@@ -115,7 +116,7 @@ else
   TARGET="$MVOUT"
   OUTNAME="$MOVIENAME [$YEAR] [$QUALITY]"
   sendToIRC "Transferring Movie: $OUTNAME"
-  if [[ $TYPE == mkv ]] || [[ $TYPE == mp4 ]]; then
+  if [[ $TYPE == mkv ]] || [[ $TYPE == mp4 ]] || [[ $TYPE == avi ]]; then
     SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
     sendToLog "Copying '$SOURCE' to '$TARGET'"
     cp "$SOURCE" "$TARGET/$OUTNAME.$TYPE"
