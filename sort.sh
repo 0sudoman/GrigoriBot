@@ -34,6 +34,16 @@ function find_name {
   if [[ "$SHOW" != "UNKNOWN" ]]; then
     SORT="TV"
     sendToLog "Show matched: $SHOWNAME"
+    # determine season & episode
+    SEASON="UNKNOWN" && EPISODE="UNKNOWN"
+    for i in $( seq -w 30 ); do if [[ "$DIR" =~ .*[Ss]$i.* ]]; then SEASON="$i"; fi; done
+    for i in $( seq -w 30 ); do if [[ "$DIR" =~ .*[Ee]$i.* ]]; then EPISODE="$i"; fi; done
+    if [ $SEASON == "UNKNOWN" ] || [ $EPISODE == "UNKNOWN" ]; then
+      sendToIRC "$DIR Error [Season/Episode Error]"
+      exit
+    fi
+    sendToLog "Season/Episode matched: S${SEASON}E${EPISODE}"
+
   else
     SORT="Movie"
     sendToLog "No TV show matched. Assuming it's a movie."
@@ -42,7 +52,8 @@ function find_name {
       MOVIENAME="${BASH_REMATCH[1]}"
       YEAR="${BASH_REMATCH[2]}${BASH_REMATCH[3]}"
     else
-      sendToIRC "Could not find necessary data [name/year]. Terminating."
+      sendToLog "Could not find a year. It's probably not a movie."
+      sendToIRC "$DIR Error [Name Error]"
       exit
     fi
     for i in $( seq 10 ); do MOVIENAME=${MOVIENAME/\./\ }; done
@@ -56,7 +67,8 @@ function find_type {
   elif [[ -n $( find "$IN/$DIR" -name *.mkv ) ]]; then TYPE="mkv";
   elif [[ -n $( find "$IN/$DIR" -name *.mp4 ) ]]; then TYPE="mp4";
   else
-    sendToIRC "Could not find necessary data [filetype]. Terminating."
+    sendToLog "Could not find a video file/archive. Are you sure the file exists?"
+    sendToIRC "$DIR Error [Filetype Error]"
     exit
   fi
   sendToLog "Filetype matched: $TYPE"
@@ -68,8 +80,7 @@ function find_quality {
   elif [[ $DIR =~ "720p" ]]; then QUALITY="720p"
   elif [[ $DIR =~ "1080p" ]]; then QUALITY="1080p"
   else
-    sendToIRC "Could not find necessary data [quality]. Terminating."
-    exit
+    sendToLog "Could not find a valid quality. Continuing anyways."
   fi
   sendToLog "Quality matched: $QUALITY"
 }
@@ -79,28 +90,30 @@ function check_if_exists {
   if [[ $SORT == "TV" ]]; then
     TARGET="$TVOUT/$SHOW/Season $SEASON/"
     if [[ -n $( find "$TARGET" -name *[Ee]$EPISODE* ) ]]; then
-      sendToIRC "Target file already exists. Terminating."; exit
+      sendToIRC "$DIR Error [Already Exists]"; exit
     fi
 
   else
     if [[ -n $( find "$MVOUT" -name "$MOVIENAME"* ) ]]; then
-      if [[ -n $( find "$MVOUT" -name "$MOVIENAME"*CAM* ) ]] && [[ $QUALITY != "CAM" ]]; then
-        sendToIRC "Target file already exists, but it's a cam. Upgrading to $QUALITY."
+      if [[ -n $( find "$MVOUT" -name "$MOVIENAME"*CAM* ) ]] && [[ $QUALITY == "720p" ]] || [[ $QUALITY == "1080p" ]]; then
+        sendToLog "Deleting CAM version to make way for $QuALITY version."
+        sendToIRC "$DIR Notice [Upgrading]"
         rm "$MVOUT/$MOVIENAME"*CAM*
       elif [[ -n $( find "$MVOUT" -name "$MOVIENAME"*720p* ) ]] && [[ $QUALITY == "1080p" ]]; then
-        sendToIRC "Target file already exists, but it's only 720p. Upgrading to $QUALITY."
+        sendToLog "Deleting 720p version to make way for $QUALITY version."
+        sendToIRC "$DIR Notice [Upgrading]"
         rm "$MVOUT/$MOVIENAME"*720p*
       else
-        sendToIRC "Target file already exists. Terminating."; exit
+        sendToIRC "$DIR Error [Already Exists]"; exit
       fi
     fi
   fi
 }
 
 function transfer_file {
-  #do the thing
+  # do the thing
   if [[ $SORT == "TV" ]]; then
-    sendToIRC "Transferring $SHOW S${SEASON}E${EPISODE} $QUALITY"
+    sendToLog "Transferring $SHOW S${SEASON}E${EPISODE} $QUALITY"
     if [[ $TYPE == mkv ]] || [[ $TYPE == mp4 ]]; then
       SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
       sendToLog "Copying '$SOURCE' to '$TARGET'"
@@ -115,10 +128,10 @@ function transfer_file {
   else
     TARGET="$MVOUT"
     OUTNAME="$MOVIENAME [$YEAR] [$QUALITY]"
-    sendToIRC "Transferring Movie: $OUTNAME"
+    sendToLog "Transferring Movie: $OUTNAME"
     if [[ $TYPE == mkv ]] || [[ $TYPE == mp4 ]]; then
       SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
-      sendToLog "Copying '$SOURCE' to '$TARGET'"
+      sendToLog "Copying '$SOURCE' to '$TARGET' as '$OUTNAME.mkv'"
       cp "$SOURCE" "$TARGET/$OUTNAME.$TYPE"
     fi
     if [[ $TYPE == rar ]]; then
@@ -127,7 +140,7 @@ function transfer_file {
       mkdir "$TEMP/$TEMPFILE"
       unrar e "$IN/$DIR/*.rar" "$TEMP/$TEMPFILE"
       SOURCE="$( ls -S $TEMP/$TEMPFILE | head -1 )"
-      sendToLog "Copying '$SOURCE' to '$TARGET' as '$OUTNAME.mkv'"
+      sendToLog "Moving '$SOURCE' to '$TARGET' as '$OUTNAME.mkv'"
       mv "$TEMP/$TEMPFILE/$SOURCE" "$TARGET/$OUTNAME.mkv"
       rm -r "$TEMP/$TEMPFILE"
     fi
@@ -138,17 +151,17 @@ function verify_transfer {
   # see if the thing was done
   if [[ $SORT == "TV" ]]; then
     if [[ -n $( find "$TARGET" -name *[Ee]$EPISODE* ) ]]; then
-      sendToIRC "TV Transfer Successful."
+      sendToIRC "$SHOW S${SEASON}E${EPISODE} Transferred successfully."
       sendToDiscord "New in TV: $SHOW S${SEASON}E${EPISODE}"
     else
-      sendToIRC "TV Transfer Failed." && exit
+      sendToIRC "$DIR Error [Transfer Failed]" && exit
     fi
   else
     if [[ -n $( find "$MVOUT" -name "$MOVIENAME"* ) ]]; then
-      sendToIRC "Movie Transfer Successful."
+      sendToIRC "$OUTNAME Transferred Successfully."
       sendToDiscord "New in Movies: $OUTNAME"
     else
-      sendToIRC "Movie Transfer Failed." && exit
+      sendToIRC "$DIR Error [Transfer Failed]" && exit
     fi
   fi
 }
