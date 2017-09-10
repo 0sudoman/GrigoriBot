@@ -66,6 +66,7 @@ function find_type {
   if [[ -n $( find "$IN/$DIR" -name *.rar ) ]]; then TYPE="rar";
   elif [[ -n $( find "$IN/$DIR" -name *.mkv ) ]]; then TYPE="mkv";
   elif [[ -n $( find "$IN/$DIR" -name *.mp4 ) ]]; then TYPE="mp4";
+  elif [[ -n $( find "$IN/$DIR" -name *.avi ) ]]; then TYPE="avi";
   else
     sendToLog "Could not find a video file/archive. Are you sure the file exists?"
     sendToIRC "$DIR Error [Filetype Error]"
@@ -113,8 +114,7 @@ function check_if_exists {
 function transfer_file {
   # do the thing
   if [[ $SORT == "TV" ]]; then
-    sendToLog "Transferring $SHOW S${SEASON}E${EPISODE} $QUALITY"
-    if [[ $TYPE == mkv ]] || [[ $TYPE == mp4 ]]; then
+    if [[ $TYPE == mkv ]] || [[ $TYPE == mp4 ]] || [[ $TYPE == avi ]]; then
       SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
       sendToLog "Copying '$SOURCE' to '$TARGET'"
       cp "$SOURCE" "$TARGET"
@@ -128,10 +128,9 @@ function transfer_file {
   else
     TARGET="$MVOUT"
     OUTNAME="$MOVIENAME [$YEAR] [$QUALITY]"
-    sendToLog "Transferring Movie: $OUTNAME"
-    if [[ $TYPE == mkv ]] || [[ $TYPE == mp4 ]]; then
+    if [[ $TYPE == mkv ]] || [[ $TYPE == mp4 ]] || [[ $TYPE == avi ]]; then
       SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
-      sendToLog "Copying '$SOURCE' to '$TARGET' as '$OUTNAME.mkv'"
+      sendToLog "Copying '$SOURCE' to '$TARGET' as '$OUTNAME.$TYPE'"
       cp "$SOURCE" "$TARGET/$OUTNAME.$TYPE"
     fi
     if [[ $TYPE == rar ]]; then
