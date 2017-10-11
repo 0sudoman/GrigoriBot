@@ -3,7 +3,8 @@
 # responds to commands
 # this is seperate now so it can be edited on-the-fly without rebooting
 
-source config.sh
+BOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$BOTDIR/config.sh"
 SCRIPT="bot.sh"
 
 LINE="$1"
@@ -23,7 +24,7 @@ if [[ "$MESSAGE" == "${BOTNICK}--" ]]; then sendToIRC "D:"; fi
 if [[ $SENDER == $ADMIN ]]; then
 #if [[ "$MESSAGE" == "!reboot" ]]; then sendToIRC "Rebooting all systems."; botReboot; fi
 #if [[ "$MESSAGE" == "!shutdown" ]]; then sendToIRC "Shutting down all systems."; botShutdown; fi
-if [[ "$MESSAGE" =~ "!sort" ]]; then ./sort.sh $EXTRA; fi
+if [[ "$MESSAGE" =~ "!sort" ]]; then "$BOTDIR/sort.sh" $EXTRA; fi
 
 fi
 fi

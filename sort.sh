@@ -2,7 +2,8 @@
 # sort.sh
 # sorts out TV shows and shit
 
-source config.sh
+BOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$BOTDIR/config.sh"
 SCRIPT="sort.sh"
 sendToLog "Started"
 
@@ -63,10 +64,10 @@ function find_name {
 
 function find_type {
   # determine filetype
-  if [[ -n $( find "$IN/$DIR" -name *.rar ) ]]; then TYPE="rar";
-  elif [[ -n $( find "$IN/$DIR" -name *.mkv ) ]]; then TYPE="mkv";
-  elif [[ -n $( find "$IN/$DIR" -name *.mp4 ) ]]; then TYPE="mp4";
-  elif [[ -n $( find "$IN/$DIR" -name *.avi ) ]]; then TYPE="avi";
+  if [[ -n $( find "$IN/$DIR" -name "*.rar" ) ]]; then TYPE="rar";
+  elif [[ -n $( find "$IN/$DIR" -name "*.mkv" ) ]]; then TYPE="mkv";
+  elif [[ -n $( find "$IN/$DIR" -name "*.mp4" ) ]]; then TYPE="mp4";
+  elif [[ -n $( find "$IN/$DIR" -name "*.avi" ) ]]; then TYPE="avi";
   else
     sendToLog "Could not find a video file/archive. Are you sure the file exists?"
     sendToIRC "$DIR Error [Filetype Error]"
@@ -90,17 +91,17 @@ function check_if_exists {
   # check for upgrades
   if [[ $SORT == "TV" ]]; then
     TARGET="$TVOUT/$SHOW/Season $SEASON/"
-    if [[ -n $( find "$TARGET" -name *[Ee]$EPISODE* ) ]]; then
+    if [[ -n $( find "$TARGET" -name "*[Ee]$EPISODE*" ) ]]; then
       sendToIRC "$DIR Error [Already Exists]"; exit
     fi
 
   else
-    if [[ -n $( find "$MVOUT" -name "$MOVIENAME"* ) ]]; then
-      if [[ -n $( find "$MVOUT" -name "$MOVIENAME"*CAM* ) ]] && [[ $QUALITY == "720p" ]] || [[ $QUALITY == "1080p" ]]; then
-        sendToLog "Deleting CAM version to make way for $QuALITY version."
+    if [[ -n $( find "$MVOUT" -name "${MOVIENAME}*" ) ]]; then
+      if [[ -n $( find "$MVOUT" -name "${MOVIENAME}*CAM*" ) ]] && [[ $QUALITY == "720p" ]] || [[ $QUALITY == "1080p" ]]; then #this is definitely borked
+        sendToLog "Deleting CAM version to make way for $QUALITY version."
         sendToIRC "$DIR Notice [Upgrading]"
         rm "$MVOUT/$MOVIENAME"*CAM*
-      elif [[ -n $( find "$MVOUT" -name "$MOVIENAME"*720p* ) ]] && [[ $QUALITY == "1080p" ]]; then
+      elif [[ -n $( find "$MVOUT" -name "${MOVIENAME}*720p*" ) ]] && [[ $QUALITY == "1080p" ]]; then
         sendToLog "Deleting 720p version to make way for $QUALITY version."
         sendToIRC "$DIR Notice [Upgrading]"
         rm "$MVOUT/$MOVIENAME"*720p*
@@ -122,7 +123,7 @@ function transfer_file {
     if [[ $TYPE == rar ]]; then
       SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
       sendToLog "Unraring '$SOURCE' to '$TARGET'"
-      unrar e "$SOURCE" "$TARGET"
+      unrar e -o- "$SOURCE" "$TARGET"
     fi
 
   else
@@ -149,14 +150,14 @@ function transfer_file {
 function verify_transfer {
   # see if the thing was done
   if [[ $SORT == "TV" ]]; then
-    if [[ -n $( find "$TARGET" -name *[Ee]$EPISODE* ) ]]; then
+    if [[ -n $( find "$TARGET" -name "*[Ee]$EPISODE*" ) ]]; then
       sendToIRC "$SHOW S${SEASON}E${EPISODE} Transferred successfully."
       sendToDiscord "New in TV: $SHOW S${SEASON}E${EPISODE}"
     else
       sendToIRC "$DIR Error [Transfer Failed]" && exit
     fi
   else
-    if [[ -n $( find "$MVOUT" -name "$MOVIENAME"* ) ]]; then
+    if [[ -n $( find "$MVOUT" -name "${MOVIENAME}*" ) ]]; then
       sendToIRC "$OUTNAME Transferred Successfully."
       sendToDiscord "New in Movies: $OUTNAME"
     else
