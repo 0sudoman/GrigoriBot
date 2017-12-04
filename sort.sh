@@ -27,9 +27,8 @@ function find_name {
   # determine show name (if it's a show)
   for FILE in $TVOUT/*; do
     if [[ "$FILE" =~ .{${#TVOUT}}.(.*)$ ]]; then SHOWNAME="${BASH_REMATCH[1]}"; fi
-    if [[ "$FILE" =~ .{${#TVOUT}}.(.{1,13}) ]]; then SHOWMOD="${BASH_REMATCH[1]}"; fi
-    for i in $( seq 5 ); do SHOWMOD=${SHOWMOD/\./}; done
-    for i in $( seq 5 ); do SHOWMOD=${SHOWMOD/\ /\.}; done
+    if [[ "$FILE" =~ .{${#TVOUT}}.(.{1,17}) ]]; then SHOWMOD="${BASH_REMATCH[1]}"; fi
+    SHOWMOD=${SHOWMOD//\./} && SHOWMOD=${SHOWMOD//\ /\.}
     SHOWMOD=${SHOWMOD/\'/} && SHOWMOD=${SHOWMOD/\(/} && SHOWMOD=${SHOWMOD/\)/}
     if [[ "${DIR,,}" =~ ^"${SHOWMOD,,}" ]]; then SHOW="$SHOWNAME"; break; fi
   done
@@ -79,7 +78,7 @@ function find_type {
 
 function find_quality {
   # determine quality
-  if [[ $DIR =~ "DVD[Ss][Cc][Rr]" ]] || [[ $DIR =~ "HC.HD[Rr][Ii][Pp]" ]] || [[ $DIR =~ "TS." ]]; then QUALITY="CAM"
+  if [[ $DIR =~ "DVD[Ss][Cc][Rr]" ]] || [[ $DIR =~ "HC.HD[Rr][Ii][Pp]" ]] || [[ $DIR =~ "CAM" ]] || [[ $DIR =~ "TS." ]]; then QUALITY="CAM"
   elif [[ $DIR =~ "720p" ]]; then QUALITY="720p"
   elif [[ $DIR =~ "1080p" ]]; then QUALITY="1080p"
   else
@@ -120,11 +119,13 @@ function transfer_file {
       SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
       sendToLog "Copying '$SOURCE' to '$TARGET'"
       cp "$SOURCE" "$TARGET"
+      chmod -R +r "$TARGET"
     fi
     if [[ $TYPE == rar ]]; then
       SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
       sendToLog "Unraring '$SOURCE' to '$TARGET'"
       unrar e -o- "$SOURCE" "$TARGET"
+      chmod -R +r "$TARGET"
     fi
 
   else
