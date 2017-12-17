@@ -116,7 +116,12 @@ function transfer_file {
   # do the thing
   if [[ $SORT == "TV" ]]; then
     if [[ $TYPE == mkv ]] || [[ $TYPE == mp4 ]] || [[ $TYPE == avi ]]; then
-      SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
+      if [[ $DIR =~ $TYPE ]]; then
+        #the BTN exception
+        SOURCE="$IN/$DIR"
+      else
+        SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
+      fi
       sendToLog "Copying '$SOURCE' to '$TARGET'"
       cp "$SOURCE" "$TARGET"
       chmod -R +r "$TARGET"
