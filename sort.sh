@@ -92,7 +92,13 @@ function check_if_exists {
   if [[ $SORT == "TV" ]]; then
     TARGET="$TVOUT/$SHOW/Season $SEASON/"
     if [[ -n $( find "$TARGET" -name "*[Ee]$EPISODE*" ) ]]; then
-      sendToIRC "$DIR Error [Already Exists]"; exit
+      if [[ ${DIR,,} =~ "proper" ]] || [[ ${DIR,,} =~ "repack" ]]; then
+        sendToLog "Deleting previous version to make way for repack."
+        sendToIRC "$DIR Notice [Upgrading]"
+        rm "$TARGET"/*S${SEASON}E${EPISODE}*
+      else
+        sendToIRC "$DIR Error [Already Exists]"; exit
+      fi
     fi
 
   else
