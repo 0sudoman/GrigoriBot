@@ -2,193 +2,330 @@
 # sort.sh
 # sorts out TV shows and shit
 
-BOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "$BOTDIR/config.sh"
-SCRIPT="sort.sh"
-sendToLog "Started"
+# STARTUP INFO
+botDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$botDir/config.sh"
+scriptName="sort.sh"
+logInfo "Script started."
 
-args=("$@")
+sortArgs=("$@")
 
-function get_input {
-  # get input
-  DIR="${args[0]}"
-  sendToLog "Sorting $DIR"
+# set defaults
+isMovie=-1
+isTV=-1
+isFolder=-1
+isFile=-1
+fileType=-1
 
-  # set defaults
-  SHOW="UNKNOWN"
-  TYPE="UNKNOWN"
-  QUALITY="UNKNOWN"
-  CHECK=1
-  TRANSFER=1
-  VERIFY=1
+movieName=-1
+movieYear=-1
+movieQuality=-1
+
+tvName=-1
+tvStyle=-1
+tvSeason=-1
+tvEpiosde=-1
+tvYear=-1
+tvDate=-1
+
+function getInput {
+  logInfo "Getting Input..."
+  sortInput="${sortArgs[0]}"
+  logInfo "Input Acquired: $sortInput"
 }
 
-function find_name {
-  # determine show name (if it's a show)
-  for FILE in $TVOUT/*; do
-    if [[ "$FILE" =~ .{${#TVOUT}}.(.*)$ ]]; then SHOWNAME="${BASH_REMATCH[1]}"; fi
-    if [[ "$FILE" =~ .{${#TVOUT}}.(.{1,17}) ]]; then SHOWMOD="${BASH_REMATCH[1]}"; fi
-    SHOWMOD=${SHOWMOD//\./} && SHOWMOD=${SHOWMOD//\ /\.}
-    SHOWMOD=${SHOWMOD/\'/} && SHOWMOD=${SHOWMOD/\(/} && SHOWMOD=${SHOWMOD/\)/}
-    if [[ "${DIR,,}" =~ ^"${SHOWMOD,,}" ]]; then SHOW="$SHOWNAME"; break; fi
+function findMovieOrTv {
+  logInfo "Finding Movie/TV Status..."
+  for sampleFile in $tvDir/*; do
+    if [[ "$sampleFile" =~ .{${#tvDir}}.(.*)$ ]]; then tvNameTest="${BASH_REMATCH[1]}"; fi
+    if [[ "$sampleFile" =~ .{${#tvDir}}.(.{1,17}) ]]; then sampleMod="${BASH_REMATCH[1]}"; fi
+    sampleMod=${sampleMod//\./} && sampleMod=${sampleMod//\ /\.}
+    sampleMod=${sampleMod/\'/} && sampleMod=${sampleMod/\(/} && sampleMod=${sampleMod/\)/}
+    inputMod=${sortInput/\'/}
+    if [[ "${inputMod,,}" =~ ^"${sampleMod,,}" ]]; then
+      tvName="$tvNameTest"
+      break
+    fi
   done
-  if [[ "$SHOW" != "UNKNOWN" ]]; then
-    SORT="TV"
-    sendToLog "Show matched: $SHOWNAME"
-    # determine season & episode
-    SEASON="UNKNOWN" && EPISODE="UNKNOWN"
-    for i in $( seq -w 30 ); do if [[ "$DIR" =~ .*[Ss]$i.* ]]; then SEASON="$i"; fi; done
-    for i in $( seq -w 30 ); do if [[ "$DIR" =~ .*[Ee]$i.* ]]; then EPISODE="$i"; fi; done
-    if [ $SEASON == "UNKNOWN" ] || [ $EPISODE == "UNKNOWN" ]; then
-      sendToIRC "$DIR Error [Season/Episode Error]"
-      exit
-    fi
-    sendToLog "Season/Episode matched: S${SEASON}E${EPISODE}"
-
+  if [[ "$tvName" != -1 ]]; then
+    isMovie=0
+    isTV=1
+    logInfo " Movie/TV Status: TV"
+    logInfo " Show matched: $tvName"
   else
-    SORT="Movie"
-    sendToLog "No TV show matched. Assuming it's a movie."
-    # determine movie name and year
-    if [[ $DIR =~ (.*).(19|20)([0-9]{2}) ]]; then
-      MOVIENAME="${BASH_REMATCH[1]}"
-      YEAR="${BASH_REMATCH[2]}${BASH_REMATCH[3]}"
-    else
-      sendToLog "Could not find a year. It's probably not a movie."
-      sendToIRC "$DIR Error [Name Error]"
-      exit
-    fi
-    for i in $( seq 10 ); do MOVIENAME=${MOVIENAME/\./\ }; done
-    sendToLog "Movie matched: $MOVIENAME [$YEAR]"
+    isMovie=1
+    isTV=0
+    logInfo " No TV Show found."
+    logInfo " Assuming it's a movie."
   fi
 }
 
-function find_type {
-  # determine filetype
-  if [[ -n $( find "$IN/$DIR" -name "*.rar" ) ]]; then TYPE="rar";
-  elif [[ -n $( find "$IN/$DIR" -name "*.mkv" ) ]]; then TYPE="mkv";
-  elif [[ -n $( find "$IN/$DIR" -name "*.mp4" ) ]]; then TYPE="mp4";
-  elif [[ -n $( find "$IN/$DIR" -name "*.avi" ) ]]; then TYPE="avi";
+function findMovieData {
+  logInfo "Finding Movie Information..."
+  if [[ $sortInput =~ (.*).(19|20)([0-9]{2}) ]]; then
+    movieName="${BASH_REMATCH[1]}"
+    movieYear="${BASH_REMATCH[2]}${BASH_REMATCH[3]}"
+    for i in $( seq 10 ); do MOVIENAME=${MOVIENAME/\./\ }; done
+    logInfo " Movie/TV Status: Movie"
+    logInfo " Movie matched: $movieName [$movieYear]"
   else
-    sendToLog "Could not find a video file/archive. Are you sure the file exists?"
-    sendToIRC "$DIR Error [Filetype Error]"
+    logWarn " Could not find a year. It's probably not a movie."
+    logError "Error XX [Movie Data Error] $sortInput"
     exit
   fi
-  sendToLog "Filetype matched: $TYPE"
 }
 
-function find_quality {
-  # determine quality
-  if [[ $DIR =~ "DVD[Ss][Cc][Rr]" ]] || [[ $DIR =~ "HC.HD[Rr][Ii][Pp]" ]] || [[ $DIR =~ "CAM" ]] || [[ $DIR =~ "TS." ]]; then QUALITY="CAM"
-  elif [[ $DIR =~ "720p" ]]; then QUALITY="720p"
-  elif [[ $DIR =~ "1080p" ]]; then QUALITY="1080p"
+function findMovieQuality {
+  logInfo "Finding Movie Quality..."
+  if [[ $sortInput =~ "DVD[Ss][Cc][Rr]" ]] || [[ $sortInput =~ "HC.HD[Rr][Ii][Pp]" ]] || [[ $sortInput =~ "CAM" ]]; then movieQuality="CAM"
+  elif [[ $sortInput =~ "720p" ]]; then movieQuality="720p"
+  elif [[ $sortInput =~ "1080p" ]]; then movieQuality="1080p"
   else
-    sendToLog "Could not find a valid quality. Continuing anyways."
+    #logWarn " Could not find a valid quality."
+    #logError "Error XX [Movie Quality Error] $sortInput"
+    #exit
+    movieQuality="UNKNOWN"
+    logWarn " Could not find a valid quality. Continuing anyways."
   fi
-  sendToLog "Quality matched: $QUALITY"
+  logInfo " Quality matched: $movieQuality"
 }
 
-function check_if_exists {
-  # check for upgrades
-  if [[ $SORT == "TV" ]]; then
-    TARGET="$TVOUT/$SHOW/Season $SEASON/"
-    if [[ -n $( find "$TARGET" -name "*[Ee]$EPISODE*" ) ]]; then
-      if [[ ${DIR,,} =~ "proper" ]] || [[ ${DIR,,} =~ "repack" ]]; then
-        sendToLog "Deleting previous version to make way for repack."
-        sendToIRC "$DIR Notice [Upgrading]"
-        rm "$TARGET"/*S${SEASON}E${EPISODE}*
-      else
-        sendToIRC "$DIR Error [Already Exists]"; exit
-      fi
-    fi
-
+function findFileType {
+  logInfo "Finding Filetype..."
+  if [[ -n $( find "$sortDir/$sortInput" -name "*.rar" ) ]]; then fileType="rar";
+  elif [[ -n $( find "$sortDir/$sortInput" -name "*.mkv" ) ]]; then fileType="mkv";
+  elif [[ -n $( find "$sortDir/$sortInput" -name "*.mp4" ) ]]; then fileType="mp4";
+  elif [[ -n $( find "$sortDir/$sortInput" -name "*.avi" ) ]]; then fileType="avi";
   else
-    if [[ -n $( find "$MVOUT" -name "${MOVIENAME}*" ) ]]; then
-      if [[ -n $( find "$MVOUT" -name "${MOVIENAME}*CAM*" ) ]] && [[ $QUALITY == "720p" ]] || [[ $QUALITY == "1080p" ]]; then #this is definitely borked
-        sendToLog "Deleting CAM version to make way for $QUALITY version."
-        sendToIRC "$DIR Notice [Upgrading]"
-        rm "$MVOUT/$MOVIENAME"*CAM*
-      elif [[ -n $( find "$MVOUT" -name "${MOVIENAME}*720p*" ) ]] && [[ $QUALITY == "1080p" ]]; then
-        sendToLog "Deleting 720p version to make way for $QUALITY version."
-        sendToIRC "$DIR Notice [Upgrading]"
-        rm "$MVOUT/$MOVIENAME"*720p*
-      else
-        sendToIRC "$DIR Error [Already Exists]"; exit
-      fi
-    fi
+    logWarn " Could not find a video file/archive. Are you sure the file exists?"
+    logError "Error XX [Filetype Error] $sortInput"
+    exit
+  fi
+  if [[ "$fileType" != -1 ]]; then
+    logInfo " Filetype matched: $fileType"
   fi
 }
 
-function transfer_file {
-  # do the thing
-  if [[ $SORT == "TV" ]]; then
-    if [[ $TYPE == mkv ]] || [[ $TYPE == mp4 ]] || [[ $TYPE == avi ]]; then
-      if [[ $DIR =~ $TYPE ]]; then
-        #the BTN exception
-        SOURCE="$IN/$DIR"
-      else
-        SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
-      fi
-      sendToLog "Copying '$SOURCE' to '$TARGET'"
-      cp "$SOURCE" "$TARGET"
-      chmod -R +r "$TARGET"
-    fi
-    if [[ $TYPE == rar ]]; then
-      SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
-      sendToLog "Unraring '$SOURCE' to '$TARGET'"
-      unrar e -o- "$SOURCE" "$TARGET"
-      chmod -R +r "$TARGET"
-    fi
-
+function findFolderOrFile {
+  logInfo "Finding Folder/File Status..."
+  if [[ $sortInput =~ $fileType ]]; then
+    isFolder=0
+    isFile=1
+    logInfo " Folder/File Status: File"
   else
-    TARGET="$MVOUT"
-    OUTNAME="$MOVIENAME [$YEAR] [$QUALITY]"
-    if [[ $TYPE == mkv ]] || [[ $TYPE == mp4 ]] || [[ $TYPE == avi ]]; then
-      SOURCE="$IN/$DIR/$( ls -S $IN/$DIR | grep $TYPE | head -1 )"
-      sendToLog "Copying '$SOURCE' to '$TARGET' as '$OUTNAME.$TYPE'"
-      cp "$SOURCE" "$TARGET/$OUTNAME.$TYPE"
-    fi
-    if [[ $TYPE == rar ]]; then
-      for i in $( seq 8 ); do TEMPFILE="${TEMPFILE}$(( RANDOM % 10 ))"; done
-      sendToLog "Unraring '$IN/$DIR/*.rar' to '$TEMP/$TEMPFILE'"
-      mkdir "$TEMP/$TEMPFILE"
-      unrar e "$IN/$DIR/*.rar" "$TEMP/$TEMPFILE"
-      SOURCE="$( ls -S $TEMP/$TEMPFILE | head -1 )"
-      sendToLog "Moving '$SOURCE' to '$TARGET' as '$OUTNAME.mkv'"
-      mv "$TEMP/$TEMPFILE/$SOURCE" "$TARGET/$OUTNAME.mkv"
-      rm -r "$TEMP/$TEMPFILE"
-    fi
+    isFolder=1
+    isFile=0
+    logInfo " Folder/File Status: Folder"
   fi
 }
 
-function verify_transfer {
-  # see if the thing was done
-  if [[ $SORT == "TV" ]]; then
-    if [[ -n $( find "$TARGET" -name "*[Ee]$EPISODE*" ) ]]; then
-      sendToIRC "$SHOW S${SEASON}E${EPISODE} Transferred successfully."
-      sendToDiscord "New in TV: $SHOW S${SEASON}E${EPISODE}"
+function findTvData {
+  logInfo "Finding TV Data..."
+  if [[ $sortInput =~ (.*).(19|20)([0-9]{2}).([0-9]{2}).([0-9]{2}) ]]; then
+    tvYear="${BASH_REMATCH[2]}${BASH_REMATCH[3]}"
+    tvDate="${BASH_REMATCH[2]}${BASH_REMATCH[3]}.${BASH_REMATCH[4]}.${BASH_REMATCH[5]}"
+    tvStyle=2
+    logInfo " TV Style: YYYY.MM.DD (2)"
+    logInfo " TV Year: $tvYear"
+    logInfo " TV Date: $tvDate"
+  else
+    for i in $( seq -w 99 ); do if [[ "$sortInput" =~ .*[Ss]$i.* ]]; then tvSeason="$i"; fi; done
+    for i in $( seq -w 99 ); do if [[ "$sortInput" =~ .*[Ee]$i.* ]]; then tvEpisode="$i"; fi; done
+    if [[ $tvSeason != -1 && $tvEpisode != -1 ]]; then
+      tvStyle=1
+      logInfo " TV Style: SXXEXX (1)"
+      logInfo " TV Season: $tvSeason"
+      logInfo " TV Episode: $tvEpisode"
     else
-      sendToIRC "$DIR Error [Transfer Failed]" && exit
-    fi
-  else
-    if [[ -n $( find "$MVOUT" -name "${MOVIENAME}*" ) ]]; then
-      sendToIRC "$OUTNAME Transferred Successfully."
-      sendToDiscord "New in Movies: $OUTNAME"
-    else
-      sendToIRC "$DIR Error [Transfer Failed]" && exit
+      logWarn " Could not find TV Data."
+      logError "Error XX [TV Data Error] $sortInput"
+      exit
     fi
   fi
 }
 
+function seeIfExistsMovie {
+  logInfo "Finding Movie..."
+  if [[ -n $( find "$movieDir" -name "${movieName}*" ) ]]; then
+    if [[ -n $( find "$movieDir" -name "${movieName}*CAM*" ) ]] && [[ $movieQuality == "720p" || $movieQuality == "1080p" ]]; then
+      logWarn " Deleting CAM version to make way for $movieQuality version."
+      rm "$movieDir/$movieName"*CAM*
+    elif [[ -n $( find "$movieDir" -name "${moviename}*720p*" ) ]] && [[ $movieQuality == "1080p" ]]; then
+      logWarn " Deleting 720p version to make way for $movieQuality version."
+      rm "$movieDir/$movieName"*720p*
+    else
+      logError "Error XX [Movie Already Exists] $sortInput"; exit
+    fi
+  else
+    logInfo " Movie does not already exist. Proceeding."
+  fi
+}
 
-# main function
-get_input
-if [[ "$SHOW" == "UNKNOWN" ]]; then find_name; fi
-if [[ "$TYPE" == "UNKNOWN" ]]; then find_type; fi
-if [[ "$QUALITY" == "UNKNOWN" ]]; then find_quality; fi
-if [[ $CHECK == 1 ]]; then check_if_exists; fi
-if [[ $TRANSFER == 1 ]]; then transfer_file; fi
-if [[ $VERIFY == 1 ]]; then verify_transfer; fi
+function seeIfExistsTV1 {
+  logInfo "Finding Episode..."
+  if [[ -n $( find "$tvDir/$tvName/Season $tvSeason" -name "*[Ee]${tvEpisode}*" 2> /dev/null ) ]]; then
+    if [[ $sortInput =~ "PROPER" ]]; then
+      logWarn " Deleting old version to make way for PROPER."
+      rm "$tvDir/$tvName/Season $tvSeason/*E$tvSeason*"
+    fi
+    logError "Error XX [Episode Already Exists] $sortInput"; exit
+  else
+    logInfo " Episode does not already exist. Proceeding."
+  fi
+}
 
-sendToLog "Finished"
+function seeIfExistsTV2 {
+  logInfo "Finding Episode..."
+  if [[ -n $( find "$tvDir/$tvName/Season $tvYear" -name "*${tvDate}*" 2> /dev/null ) ]]; then
+    logError "Error XX [Episode Already Exists] $sortInput"; exit
+  else
+    logInfo " Episode does not already exist. Proceeding."
+  fi
+}
+
+function sortMovie {
+  logInfo "Sorting Movie..."
+  movieFullname="$movieName [$movieYear] [$movieQuality]"
+  if [[ $fileType == mkv ]] || [[ $fileType == mp4 ]] || [[ $fileType == avi ]]; then
+    if [[ $isFolder == 1 ]]; then
+      movieSource="$sortDir/$sortInput/$( ls -S $sortDir/$sortInput | grep $fileType | head -1 )"
+      movieTarget="$movieDir/$movieFullname.$fileType"
+      logInfo " Copying '$movieSource' to '$movieTarget'"
+      cp "$movieSource" "$movieTarget"
+    elif [[ $isFile == 1 ]]; then
+      movieSource="$sortDir/$sortInput"
+      movieTarget="$movieDir/$movieFullname.$fileType"
+      logInfo " Copying '$movieSource' to '$movieTarget'"
+      cp "$movieSource" "$movieTarget"
+    fi
+  elif [[ $fileType == rar ]]; then
+    tempDirActive="$tempDir/"
+    for i in $( seq 8 ); do tempDirActive="${tempDirActive}$(( RANDOM % 10 ))"; done
+    movieSourceRar="$sortDir/$sortInput"
+    movieTarget="$movieDir/$movieFullname.mkv"
+    logInfo " Unraring '$movieSourceRar' archives to '$tempDirActive'"
+    mkdir "$tempDirActive"
+    unrar e "$movieSourceRar/*.rar" "$tempDirActive" > /dev/null
+    movieSource="$tempDirActive/$( ls -S $tempDirActive | head -1 )"
+    logInfo " Moving '$movieSource' to '$movieTarget'"
+    mv "$movieSource" "$movieTarget"
+    rm -r "$tempDirActive"
+  fi
+  logInfo " Transfer complete."
+}
+
+function sortTV1 {
+  logInfo "Sorting Episode..."
+  if [[ $fileType == mkv ]] || [[ $fileType == mp4 ]] || [[ $fileType == avi ]]; then
+    if [[ $isFolder == 1 ]]; then
+      tvSource="$sortDir/$sortInput/$( ls -S $sortDir/$sortInput | grep $fileType | head -1 )"
+      tvTarget="$tvDir/$tvName/Season $tvSeason"
+      logInfo " Copying '$tvSource' to '$tvTarget'"
+      if [[ $tvEpisode == 01 ]]; then mkdir "$tvTarget" > /dev/null; fi
+      cp "$tvSource" "$tvTarget"
+    elif [[ $isFile == 1 ]]; then
+      tvSource="$sortDir/$sortInput"
+      tvTarget="$tvDir/$tvName/Season $tvSeason"
+      logInfo " Copying '$tvSource' to '$tvTarget'"
+      if [[ $tvEpisode == 01 ]]; then mkdir "$tvTarget" > /dev/null; fi
+      cp "$tvSource" "$tvTarget"
+    fi
+  elif [[ $fileType == rar ]]; then
+    tvSourceRar="$sortDir/$sortInput"
+    tvTarget="$tvDir/$tvName/Season $tvSeason"
+    logInfo " Unraring '$tvSourceRar' archives to '$tvTarget'"
+    unrar e "$tvSourceRar/*.rar" "$tvTarget" > /dev/null
+  fi
+  logInfo " Transfer complete."
+}
+
+function sortTV2 {
+  logInfo "Sorting Episode..."
+  if [[ $fileType == mkv ]] || [[ $fileType == mp4 ]] || [[ $fileType == avi ]]; then
+    if [[ $isFolder == 1 ]]; then
+      tvSource="$sortDir/$sortInput/$( ls -S $sortDir/$sortInput | grep $fileType | head -1 )"
+      tvTarget="$tvDir/$tvName/Season $tvYear"
+      logInfo " Copying '$tvSource' to '$tvTarget'"
+      cp "$tvSource" "$tvTarget"
+    elif [[ $isFile == 1 ]]; then
+      tvSource="$sortDir/$sortInput"
+      tvTarget="$tvDir/$tvName/Season $tvYear"
+      logInfo " Copying '$tvSource' to '$tvTarget'"
+      cp "$tvSource" "$tvTarget"
+    fi
+  elif [[ $fileType == rar ]]; then
+    tvSourceRar="$sortDir/$sortInput"
+    tvTarget="$tvDir/$tvName/Season $tvYear"
+    logInfo " Unraring '$tvSourceRar' archives to '$tvTarget'"
+    unrar e "$tvSourceRar/*.rar" "$tvTarget" > /dev/null
+  fi
+  logInfo " Transfer complete."
+}
+
+function verifyMovie {
+  logInfo "Finding Movie..."
+  if [[ -n $( find "$movieDir" -name "${movieName}*" ) ]]; then
+    logInfo " Movie transferred successfully"
+    logSuccess "New Movie: $movieFullname"
+  else
+    logWarn " Movie was not found."
+    logError "Error XX [Movie Transfer Error] $sortInput"
+    exit
+  fi
+}
+
+function verifyTV1 {
+  logInfo "Finding Episode..."
+  if [[ -n $( find "$tvDir/$tvName/Season $tvSeason" -name "*[Ee]${tvEpisode}*" 2> /dev/null ) ]]; then
+    logInfo " Episode transferred successfully"
+    logSuccess "New TV: $tvName S${tvSeason}E${tvEpisode}"
+  else
+    logWarn " Episode was not found."
+    logError "Error XX [TV Transfer Error] $sortInput"
+    exit
+  fi
+}
+
+function verifyTV2 {
+  logInfo "Finding Episode..."
+  if [[ -n $( find "$tvDir/$tvName/Season $tvYear" -name "*${tvDate}*" 2> /dev/null ) ]]; then
+    logInfo " Episode transferred successfully"
+    logSuccess "New TV: $tvName $tvDate"
+  else
+    logWarn " Episode was not found."
+    logError "Error XX [TV Transfer Error] $sortInput"
+    exit
+  fi
+}
+
+
+# MAIN FUNCTION
+getInput
+findFolderOrFile
+findFileType
+findMovieOrTv
+
+if [[ $isTV == 0 ]]; then
+  findMovieData
+  findMovieQuality
+elif [[ $isTV == 1 ]]; then
+  findTvData
+fi
+
+if [[ $isMovie == 1 ]]; then
+  seeIfExistsMovie
+  sortMovie
+  verifyMovie
+elif [[ $tvStyle == 1 ]]; then
+  seeIfExistsTV1
+  sortTV1
+  verifyTV1
+else
+  seeIfExistsTV2
+  sortTV2
+  verifyTV2
+fi
+
+logInfo "Finished."
 
 exit
