@@ -1,39 +1,76 @@
 #!/bin/bash
-# config.sh
+# config.sh.new
 # stores all settings
+# also some functions
+# edit this file then save it as config.sh
 
-# LOG SETTINGS
-LOGFILE="logs/latest.log"
-SCRIPT="OTHER"
+# STARTUP INFO
+botDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+scriptName="ERROR"
 
-if [[ ! -f $LOGFILE ]]; then
-  mkdir "logs"
-  LOGFILE="logs/latest.log"
-  echo "$( date ): Log file not found. Resetting to default." >> $LOGFILE
-fi
-
-# FUNCTIONS
+# BASIC FUNCTIONS
 sendToLog () {
-  echo "$( date ): $SCRIPT $1" >> $LOGFILE
+  echo "$( date ) $1" >> "$logFile"
 }
 sendToIRC () {
-  echo "$1" >> $IRC/in
-  sendToLog "IRC: $1"
+  echo "$1" >> "$ircDir/in"
 }
 sendToDiscord () {
-  echo "$1" >> todiscord
+  echo "$1" >> "$botDir/todiscord" #make this better
 }
+sendToPush () {
+  $pushDir/pushbullet push all note $botNick "$1" > /dev/null
+}
+
+logSuccess () {
+  sendToLog "SCC $scriptName $1"
+  sendToPush "$1"
+  sendToDiscord "$1"
+  sendToIRC "$1"
+  echo "$1"
+}
+logError () {
+  sendToLog "ERR $scriptName $1"
+  sendToPush "$1"
+  sendToIRC "$1"
+  echo "$1"
+}
+logWarn () {
+  sendToLog "WRN $scriptName $1"
+  echo "$1"
+}
+logInfo () {
+  sendToLog "INF $scriptName $1"
+  echo "$1"
+}
+
+logVerify () {
+  touch $logFile
+  if [[ ! -f $logFile ]]; then
+    logFile="$botDir/logs/latest.log"
+    mkdir "$botDir/logs"
+    touch $logFile
+    if [[ -f $logFile ]]; then
+      logError "Custom log file not found. Resetting to default."
+    else
+      echo "Could not generate log file."
+    fi
+  fi
+}
+
 botStartup () {
-  sendToLog "Starting Up"
-  screen -dm -S ii ii -s $SERVER -n $BOTNICK
-  screen -dm -S iinterface ./iinterface.sh
-  screen -dm -S dbot python3 ./dbot.py $TOKEN
+  logInfo "Starting Up..."
+  screen -dm -S ii ii -s $ircServer -n $botNick
+  screen -dm -S ibot "$botDir/ibot.sh"
+  screen -dm -S dbot python3 "$botDir/dbot.py" $discordToken
+  logInfo "Bot Started."
 }
 botShutdown () {
-  sendToLog "Shutting Down"
-  screen -S iinterface -X kill
-  screen -S ii -X kill
-  screen -S dbot -X kill
+  logInfo "Shutting Down..."
+  screen -S dbot -X kill > /dev/null
+  screen -S ibot -X kill > /dev/null
+  screen -S ii -X kill > /dev/null
+  logInfo "Bot is Offline."
 }
 botReboot () {
   botShutdown
@@ -41,21 +78,28 @@ botReboot () {
   botStartup
 }
 
-# IRC SETTINGS
-IIDIR="/home/user/irc"     #the directory where ii is located
-SERVER="irc.freenode.net"  #the server to connect to
-CHANNEL="#test"            #the channel to be active in
-BOTNICK="GrigoriBot"       #the nick of the bot
-ADMIN="owner"              #the nick of the owner
-JOINDELAY="10"             #the delay between sending /j messages (higher numbers reduce flooding)
+# LOG SETTINGS
+logFile="$botDir/logs/latest.log"    #location of log file
+logVerify                            #checks log file
 
-IRC="$IIDIR/$SERVER/$CHANNEL"
+# IRC SETTINGS
+iiDir="/home/user/irc"               #the directory where ii is located
+ircServer="irc.freenode.net"         #the server to connect to
+ircChannel="#freenode"               #the channel to be active in
+botNick="GrigoriBot"                 #the nick of the bot
+ircAdmin="adminperson"               #the nick of the owner
+ircJoinDelay="15"                    #the delay between sending /j messages (higher numbers reduce flooding)
+
+ircDir="$iiDir/$ircServer/$ircChannel"
 
 # FILE SETTINGS
-IN="/path/to/torrents"
-TVOUT="/path/to/tvshows"
-MVOUT="/path/to/movies"
-TEMP="/some/random/temp/folder"
+sortDir="/data/Seeds"                #where things are downloaded to
+tvDir="/data/TV"                     #where to put TV Shows
+movieDir="/data/Movies"              #where to put movies
+tempDir="/data/Temp"                 #where to store files while extracting
 
 # DISCORD SETTINGS
-TOKEN="token"
+discordToken=""                      #token used to log into discord
+
+# PUSHBULLET SETTINGS
+pushDir="/opt/pushbullet-bash"       #where the pushbullet-bash file is stored
