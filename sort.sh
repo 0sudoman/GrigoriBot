@@ -70,7 +70,8 @@ function findMovieData {
     logInfo " Movie matched: $movieName [$movieYear]"
   else
     logWarn " Could not find a year. It's probably not a movie."
-    logError "Error XX [Movie Data Error] $sortInput"
+    logWarn " Are you sure this is a thing that can be sorted?"
+    logError "Error 42 [Movie Data Error] $sortInput"
     exit
   fi
 }
@@ -82,7 +83,7 @@ function findMovieQuality {
   elif [[ $sortInput =~ "1080p" ]]; then movieQuality="1080p"
   else
     #logWarn " Could not find a valid quality."
-    #logError "Error XX [Movie Quality Error] $sortInput"
+    #logError "Error 43 [Movie Quality Error] $sortInput"
     #exit #seems a little harsh
     movieQuality="UNKNOWN"
     logWarn " Could not find a valid quality. Continuing anyways."
@@ -98,7 +99,7 @@ function findFileType {
   elif [[ -n $( find "$sortDir/$sortInput" -name "*.avi" ) ]]; then fileType="avi";
   else
     logWarn " Could not find a video file/archive. Are you sure the file exists?"
-    logError "Error XX [Filetype Error] $sortInput"
+    logError "Error 44 [Filetype Error] $sortInput"
     exit
   fi
   if [[ "$fileType" != -1 ]]; then
@@ -138,7 +139,7 @@ function findTvData {
       logInfo " TV Episode: $tvEpisode"
     else
       logWarn " Could not find TV Data."
-      logError "Error XX [TV Data Error] $sortInput"
+      logError "Error 41 [TV Data Error] $sortInput"
       exit
     fi
   fi
@@ -154,7 +155,8 @@ function seeIfExistsMovie {
       logWarn " Deleting 720p version to make way for $movieQuality version."
       rm "$movieDir/$movieName"*720p*
     else
-      logError "Error XX [Movie Already Exists] $sortInput"; exit
+      logError "Error 46 [Movie Already Exists] $sortInput"
+      exit
     fi
   else
     logInfo " Movie does not already exist. Proceeding."
@@ -168,7 +170,8 @@ function seeIfExistsTV1 {
       logWarn " Deleting old version to make way for PROPER."
       rm "$tvDir/$tvName/Season $tvSeason/*E$tvSeason*"
     fi
-    logError "Error XX [Episode Already Exists] $sortInput"; exit
+    logError "Error 45 [Episode Already Exists] $sortInput"
+    exit
   else
     logInfo " Episode does not already exist. Proceeding."
   fi
@@ -177,7 +180,8 @@ function seeIfExistsTV1 {
 function seeIfExistsTV2 {
   logInfo "Finding Episode..."
   if [[ -n $( find "$tvDir/$tvName/Season $tvYear" -name "*${tvDate}*" 2> /dev/null ) ]]; then
-    logError "Error XX [Episode Already Exists] $sortInput"; exit
+    logError "Error 45 [Episode Already Exists] $sortInput"
+    exit
   else
     logInfo " Episode does not already exist. Proceeding."
   fi
@@ -269,7 +273,7 @@ function verifyMovie {
     logSuccess "New Movie: $movieFullname"
   else
     logWarn " Movie was not found."
-    logError "Error XX [Movie Transfer Error] $sortInput"
+    logError "Error 48 [Movie Transfer Error] $sortInput"
     exit
   fi
 }
@@ -281,7 +285,7 @@ function verifyTV1 {
     logSuccess "New TV: $tvName S${tvSeason}E${tvEpisode}"
   else
     logWarn " Episode was not found."
-    logError "Error XX [TV Transfer Error] $sortInput"
+    logError "Error 47 [TV Transfer Error] $sortInput"
     exit
   fi
 }
@@ -293,7 +297,7 @@ function verifyTV2 {
     logSuccess "New TV: $tvName $tvDate"
   else
     logWarn " Episode was not found."
-    logError "Error XX [TV Transfer Error] $sortInput"
+    logError "Error 47 [TV Transfer Error] $sortInput"
     exit
   fi
 }
