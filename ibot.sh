@@ -14,7 +14,10 @@ while true; do
 
 # grab a new line
 newLine="$( tail -n1 $ircDir/out )"
-if [[ "$newLine" != "$line" ]]; then line="$NEW"; "$botDir/bot.sh" "$line"; fi
+if [[ "$newLine" != "$line" ]]; then
+  line="$newLine"
+  "$botDir/bot.sh" "$line"
+fi
 
 # join the channel
 if [[ $( date +%s ) == $rejoinTime ]] || [[ $line =~ "kicked $botNick" ]]; then

@@ -3,29 +3,45 @@
 # responds to commands
 # this is seperate now so it can be edited on-the-fly without rebooting
 
-BOTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "$BOTDIR/config.sh"
-SCRIPT="bot.sh"
+botDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$botDir/config.sh"
+scriptName="bot.sh"
 
-LINE="$1"
-if [[ "$LINE" =~ ^.{17}\<(.*)\>\ (.*)$ ]]; then SENDER="${BASH_REMATCH[1]}"; MESSAGE="${BASH_REMATCH[2]}"; fi
-if [[ "$MESSAGE" =~ ^(.*)\ (.*)$ ]]; then MESSAGE="${BASH_REMATCH[1]},,"; EXTRA="${BASH_REMATCH[2]}"
-else MESSAGE="${MESSAGE,,}"; fi
-if [[ $SENDER != $BOTNICK ]]; then
+echo "Input:   $1"
+
+ircLine="$1"
+if [[ "$ircLine" =~ ^.{17}\<(.*)\>\ (.*)$ ]]; then
+  ircSender="${BASH_REMATCH[1]}"
+  ircMessage="${BASH_REMATCH[2]}"
+fi
+if [[ "$ircMessage" =~ ^(.*)\ (.*)$ ]]; then
+  ircCommand="${BASH_REMATCH[1],,}"
+  ircExtra="${BASH_REMATCH[2]}"
+else
+  ircCommand="${ircMessage,,}"
+fi
+
+echo "Sender:  $ircSender"
+echo "Message: $ircMessage"
+echo "Command: $ircCommand"
+echo "Extra:   $ircExtra"
+
+if [[ "$ircSender" != "$botNick" ]]; then
 
 # public commands
-if [[ "$MESSAGE" == "!help" ]]; then sendToIRC "You can find my docs at https://github.com/0sudoman/GrigoriBot/blob/master/docs.md"; fi
-if [[ "$MESSAGE" == "!source" ]]; then sendToIRC "https://github.com/0sudoman/GrigoriBot"; fi
-if [[ "$MESSAGE" == "!fortune" ]]; then sendToIRC "$(fortune)"; fi
-if [[ "$MESSAGE" == "!freespace" ]]; then sendToIRC "$(df -h | grep md0p1)"; fi
-if [[ "$MESSAGE" == "${BOTNICK}++" ]]; then sendToIRC ":D"; fi
-if [[ "$MESSAGE" == "${BOTNICK}--" ]]; then sendToIRC "D:"; fi
+if [[ "$ircCommand" == "!help" ]]; then sendToIRC "You can find my docs at https://github.com/0sudoman/GrigoriBot/blob/master/docs.md"; fi
+if [[ "$ircCommand" == "!source" ]]; then sendToIRC "https://github.com/0sudoman/GrigoriBot"; fi
+if [[ "$ircCommand" == "!fortune" ]]; then sendToIRC "$(fortune)"; fi
+if [[ "$ircCommand" == "!freespace" ]]; then sendToIRC "$(df -h | grep md0p1)"; fi
+if [[ "$ircCommand" == "${BOTNICK,,}++" ]]; then sendToIRC ":D"; fi
+if [[ "$ircCommand" == "${BOTNICK,,}--" ]]; then sendToIRC "D:"; fi
 
 # admin commands
-if [[ $SENDER == $ADMIN ]]; then
-#if [[ "$MESSAGE" == "!reboot" ]]; then sendToIRC "Rebooting all systems."; botReboot; fi
-#if [[ "$MESSAGE" == "!shutdown" ]]; then sendToIRC "Shutting down all systems."; botShutdown; fi
-if [[ "$MESSAGE" =~ "!sort" ]]; then "$BOTDIR/sort.sh" $EXTRA; fi
+if [[ "$ircSender" == "$ircAdmin" ]]; then
+
+#if [[ "$ircCommand" == "!reboot" ]]; then sendToIRC "Rebooting all systems."; botReboot; fi
+#if [[ "$ircCommand" == "!shutdown" ]]; then sendToIRC "Shutting down all systems."; botShutdown; fi
+if [[ "$ircCommand" =~ "!sort" ]]; then "$botDir/sort.sh" "$ircExtra"; fi
 
 fi
 fi

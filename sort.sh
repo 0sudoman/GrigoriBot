@@ -6,7 +6,7 @@
 botDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$botDir/config.sh"
 scriptName="sort.sh"
-logInfo "Script started."
+logInfo "Started..."
 
 sortArgs=("$@")
 
@@ -31,7 +31,7 @@ tvDate=-1
 function getInput {
   logInfo "Getting Input..."
   sortInput="${sortArgs[0]}"
-  logInfo "Input Acquired: $sortInput"
+  logInfo " Input Acquired: $sortInput"
 }
 
 function findMovieOrTv {
@@ -83,7 +83,7 @@ function findMovieQuality {
   else
     #logWarn " Could not find a valid quality."
     #logError "Error XX [Movie Quality Error] $sortInput"
-    #exit
+    #exit #seems a little harsh
     movieQuality="UNKNOWN"
     logWarn " Could not find a valid quality. Continuing anyways."
   fi
@@ -301,8 +301,8 @@ function verifyTV2 {
 
 # MAIN FUNCTION
 getInput
-findFolderOrFile
 findFileType
+findFolderOrFile
 findMovieOrTv
 
 if [[ $isTV == 0 ]]; then
