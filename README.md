@@ -8,10 +8,8 @@ I built this in my free time, so don't expect anything fancy. Or functional, for
 
 GrigoriBot requires `screen` to keep things running in the background.
 You can easily change this to `tmux` or your multiplexer of choice.
-It uses `ii` to interface with IRC and a tiny script (dbot.py) to interface with Discord.
-That script requires `python3`, `discord.py`, and their dependencies.
-You can easily connect it to any service that interfaces via file structure, like `ii`.
+It uses `ii` to interface with IRC, but can be modifed to work with `irssi`.
 The fortune command requires `fortune` to be installed. Obviously.
 
 Before running GrigoriBot for the first time, be sure to customize your config.sh script.
-You will need to edit the values, then rename it to config.sh (not config.sh.example).
+You will need to edit the values, then rename it to config.sh (from config.sh.example).

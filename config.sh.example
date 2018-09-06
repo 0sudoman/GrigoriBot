@@ -16,7 +16,12 @@ sendToIRC () {
   echo "$1" >> "$ircDir/in"
 }
 sendToDiscord () {
-  echo "$1" >> "$botDir/todiscord" #make this better
+  curl -v \
+  -H "Authorization: Bot $discordToken" \
+  -H "User-Agent: GrigoriBot (https://github.com/0sudoman/GrigoriBot, v0)" \
+  -H "Content-Type: application/json" \
+  -d '{"content":"'"$1"'"}' \
+  https://discordapp.com/api/channels/${discordChannel}/messages
 }
 sendToPush () {
   $pushDir/pushbullet push all note $botNick "$1" > /dev/null
@@ -62,12 +67,10 @@ botStartup () {
   logInfo "Starting Up..."
   screen -dm -S ii ii -s $ircServer -n $botNick
   screen -dm -S ibot "$botDir/ibot.sh"
-  screen -dm -S dbot python3 "$botDir/dbot.py" $discordToken
   logInfo "Bot Started."
 }
 botShutdown () {
   logInfo "Shutting Down..."
-  screen -S dbot -X kill > /dev/null
   screen -S ibot -X kill > /dev/null
   screen -S ii -X kill > /dev/null
   logInfo "Bot is Offline."
@@ -100,6 +103,7 @@ tempDir="/data/Temp"                 #where to store files while extracting
 
 # DISCORD SETTINGS
 discordToken=""                      #token used to log into discord
+discordChannel=""                    #channel id
 
 # PUSHBULLET SETTINGS
 pushDir="/opt/pushbullet-bash"       #where the pushbullet-bash file is stored
