@@ -7,8 +7,6 @@ botDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$botDir/config.sh"
 scriptName="bot.sh"
 
-echo "Input:   $1"
-
 ircLine="$1"
 if [[ "$ircLine" =~ ^.{17}\<(.*)\>\ (.*)$ ]]; then
   ircSender="${BASH_REMATCH[1]}"
@@ -20,11 +18,6 @@ if [[ "$ircMessage" =~ ^(.*)\ (.*)$ ]]; then
 else
   ircCommand="${ircMessage,,}"
 fi
-
-echo "Sender:  $ircSender"
-echo "Message: $ircMessage"
-echo "Command: $ircCommand"
-echo "Extra:   $ircExtra"
 
 if [[ "$ircSender" != "$botNick" ]]; then
 
