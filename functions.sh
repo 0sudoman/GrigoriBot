@@ -357,13 +357,13 @@ function sortTV1 {
       tvSource="$sortDir/$sortInput/$( ls -S $sortDir/$sortInput | grep $fileType | head -1 )"
       tvTarget="$tvDir/$tvName/Season $tvSeason"
       logInfo " Copying '$tvSource' to '$tvTarget'"
-      if [[ $tvEpisode == 01 ]]; then mkdir "$tvTarget" > /dev/null; fi
+      if [[ "$tvEpisode" == "01" ]]; then mkdir "$tvTarget" > /dev/null; fi
       cp "$tvSource" "$tvTarget"
     elif [[ $folderOrFile == 2 ]]; then
       tvSource="$sortDir/$sortInput"
       tvTarget="$tvDir/$tvName/Season $tvSeason"
       logInfo " Copying '$tvSource' to '$tvTarget'"
-      if [[ $tvEpisode == 01 ]]; then mkdir "$tvTarget" > /dev/null; fi
+      if [[ "$tvEpisode" == "01" ]]; then mkdir "$tvTarget" > /dev/null; fi
       cp "$tvSource" "$tvTarget"
     fi
   elif [[ $fileType == rar ]]; then

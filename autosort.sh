@@ -7,9 +7,11 @@ botDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$botDir/config.sh"
 source "$botDir/functions.sh"
 scriptName="autosort.sh"
-logInfo "Started..."
 
 # MAIN FUNCTION
+while true; do
+logInfo "Started..."
+
 pingServer
 getSettings
 for sortInputRaw in "$sortDir"/*; do
@@ -22,19 +24,19 @@ for sortInputRaw in "$sortDir"/*; do
       logInfo "Sorting $sortInput..."
       if [[ $movieOrTV == 1 ]]; then
         seeIfExistsMovie
-        sortMovie
-        verifyMovie
-        updateInfo
+        if [[ $error != -1 ]]; then sortMovie; fi
+        if [[ $error != -1 ]]; then verifyMovie; fi
+        if [[ $error != -1 ]]; then updateInfo; fi
       elif [[ $tvStyle == 1 ]]; then
         seeIfExistsTV1
-        sortTV1
-        verifyTV1
-        updateInfo
+        if [[ $error != -1 ]]; then sortTV1; fi
+        if [[ $error != -1 ]]; then verifyTV1; fi
+        if [[ $error != -1 ]]; then updateInfo; fi
       elif [[ $tvStyle == 2 ]]; then
         seeIfExistsTV2
-        sortTV2
-        verifyTV2
-        updateInfo
+        if [[ $error != -1 ]]; then sortTV2; fi
+        if [[ $error != -1 ]]; then verifyTV2; fi
+        if [[ $error != -1 ]]; then updateInfo; fi
       elif [[ $movieOrTV == 3 ]]; then
         updateInfo
       fi
@@ -61,4 +63,6 @@ for sortInputRaw in "$sortDir"/*; do
 done
 
 logInfo "Finished."
-exit
+logInfo "Sleeping for 15 minutes..."
+sleep 900
+done
