@@ -95,7 +95,7 @@ function getDbInfo {
       logInfo " Not already sorted. Continuing..."
       logInfo " id: $id"
 
-      for i in movieOrTV folderOrFile fileType movieName movieYear movieQuality tvStyle tvName tvSeason tvEpisode tvYear tvDate sortPotential; do
+      for i in movieOrTV folderOrFile fileType movieName movieYear movieQuality tvStyle tvName tvSeason tvEpisode tvYear tvDate sortPotential sortComplete sortError; do
         dbQuery="SELECT $i FROM $dbList WHERE id=$id"
         doDbQuery
         declare -g $i="$dbResult"

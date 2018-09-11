@@ -24,19 +24,19 @@ for sortInputRaw in "$sortDir"/*; do
       logInfo "Sorting $sortInput..."
       if [[ $movieOrTV == 1 ]]; then
         seeIfExistsMovie
-        if [[ $error != -1 ]]; then sortMovie; fi
-        if [[ $error != -1 ]]; then verifyMovie; fi
-        if [[ $error != -1 ]]; then updateInfo; fi
+        if [[ $error == -1 ]]; then sortMovie; fi
+        if [[ $error == -1 ]]; then verifyMovie; fi
+        if [[ $error == -1 ]]; then updateInfo; fi
       elif [[ $tvStyle == 1 ]]; then
         seeIfExistsTV1
-        if [[ $error != -1 ]]; then sortTV1; fi
-        if [[ $error != -1 ]]; then verifyTV1; fi
-        if [[ $error != -1 ]]; then updateInfo; fi
+        if [[ $error == -1 ]]; then sortTV1; fi
+        if [[ $error == -1 ]]; then verifyTV1; fi
+        if [[ $error == -1 ]]; then updateInfo; fi
       elif [[ $tvStyle == 2 ]]; then
         seeIfExistsTV2
-        if [[ $error != -1 ]]; then sortTV2; fi
-        if [[ $error != -1 ]]; then verifyTV2; fi
-        if [[ $error != -1 ]]; then updateInfo; fi
+        if [[ $error == -1 ]]; then sortTV2; fi
+        if [[ $error == -1 ]]; then verifyTV2; fi
+        if [[ $error == -1 ]]; then updateInfo; fi
       elif [[ $movieOrTV == 3 ]]; then
         updateInfo
       fi
