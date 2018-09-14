@@ -20,32 +20,67 @@ for sortInputRaw in "$sortDir"/*; do
   getDbInfo
   if [[ $isInDB == 1 ]]; then
     getTimeSinceModify
-    if [[ $timeSinceModify -gt $sortWaitTime && $sortPotential == 1 && $sortComplete == 0 ]]; then
+    if [[ $timeSinceModify -gt $sortWaitTime && $sortPotential == 1 && $sortComplete == 0 && $sortError != "" ]]; then
       logInfo "Sorting $sortInput..."
       if [[ $movieOrTV == 1 ]]; then
         seeIfExistsMovie
-        if [[ $error == -1 ]]; then sortMovie; fi
-        if [[ $error == -1 ]]; then verifyMovie; fi
-        if [[ $error == -1 ]]; then updateInfo; fi
+        if [[ $error == -1 ]]; then
+          logWarn "Sorting $movieName [$movieYear] [$movieQuality]..."
+          sortMovie
+        fi
+        if [[ $error == -1 ]]; then
+          verifyMovie
+        fi
+        if [[ $error == -1 ]]; then
+          logWarn "Sort Successful."
+          updateInfoSuccess
+        else
+          logWarn "Sort Failed."
+          updateInfoError
+        fi
       elif [[ $tvStyle == 1 ]]; then
         seeIfExistsTV1
-        if [[ $error == -1 ]]; then sortTV1; fi
-        if [[ $error == -1 ]]; then verifyTV1; fi
-        if [[ $error == -1 ]]; then updateInfo; fi
+        if [[ $error == -1 ]]; then
+          logWarn "Sorting $tvName S${tvSeason}E${tvEpisode}..."
+          sortTV1
+        fi
+        if [[ $error == -1 ]]; then
+          verifyTV1
+        fi
+        if [[ $error == -1 ]]; then
+          logWarn "Sort Successful."
+          updateInfoSuccess
+        else
+          logWarn "Sort Failed."
+          updateInfoError
+        fi
       elif [[ $tvStyle == 2 ]]; then
         seeIfExistsTV2
-        if [[ $error == -1 ]]; then sortTV2; fi
-        if [[ $error == -1 ]]; then verifyTV2; fi
-        if [[ $error == -1 ]]; then updateInfo; fi
+        if [[ $error == -1 ]]; then
+          logWarn "Sorting $tvName $tvDate..."
+          sortTV2
+        fi
+        if [[ $error == -1 ]]; then
+          verifyTV2
+        fi
+        if [[ $error == -1 ]]; then
+          logWarn "Sort Successful"
+          updateInfoSuccess
+        else
+          logWarn "Sort Failed."
+          updateInfoError
+        fi
       elif [[ $movieOrTV == 3 ]]; then
-        updateInfo
+        updateInfoError
       fi
     elif [[ $timeSinceModify -lt $sortWaitTime ]]; then
-      loWarn "Not sorting $sortInput (too soon)."
+      logInfo "Not sorting $sortInput (too soon)."
     elif [[ $sortPotential != 1 ]]; then
-      logWarn "Not sorting $sortInput (disabled)."
+      logInfo "Not sorting $sortInput (disabled)."
     elif [[ $sortComplete != 0 ]]; then
-      logWarn "Not sorting $sortInput (already sorted)."
+      logInfo "Not sorting $sortInput (already sorted)."
+    else
+      logInfo "Not sorting $sortInput (ERROR)."
     fi
   else
     findFileType

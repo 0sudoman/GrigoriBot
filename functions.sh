@@ -102,6 +102,8 @@ function getDbInfo {
         logInfo " $i: ${!i}"
       done
 
+      if [[ sortError != "" ]]; then error="$sortError"; fi
+
     else
       logInfo " Already sorted. Passing to save time."
     fi
@@ -124,13 +126,28 @@ function getTimeSinceModify {
   fi
 }
 
-function updateInfo {
+function updateInfoSuccess {
   logInfo "Updating Information in Database..."
   dbQuery="UPDATE $dbList SET sortComplete = 1 WHERE id=\"$id\""
   doDbQuery
   dbQuery="SELECT sortComplete FROM $dbList WHERE id=\"$id\""
   doDbQuery
   if [[ "$dbResult" == 1 ]]; then
+    logInfo " Status updated succeessfully."
+  else
+    logWarn " Could not update database."
+    logError "Error 25 [Database Modify Error]"
+    error=25
+  fi
+}
+
+function updateInfoError {
+  logInfo "Updating Information in Database..."
+  dbQuery="UPDATE $dbList SET sortError = $error WHERE id=\"$id\""
+  doDbQuery
+  dbQuery="SELECT sortError FROM $dbList WHERE id=\"$id\""
+  doDbQuery
+  if [[ "$dbResult" == "$sortError" ]]; then
     logInfo " Status updated succeessfully."
   else
     logWarn " Could not update database."
@@ -214,11 +231,11 @@ function findMovieQuality {
   elif [[ $sortInput =~ "720p" ]]; then movieQuality="720p"
   elif [[ $sortInput =~ "1080p" ]]; then movieQuality="1080p"
   else
-    #logWarn " Could not find a valid quality."
-    #logError "Error 33 [Movie Quality Error] $sortInput"
-    #exit #seems a little harsh
-    movieQuality="UNKNOWN"
-    logWarn " Could not find a valid quality. Continuing anyways."
+    logWarn " Could not find a valid quality."
+    logError "Error 33 [Movie Quality Error] $sortInput"
+    error=33
+    #movieQuality="UNKNOWN"
+    #logWarn " Could not find a valid quality. Continuing anyways."
   fi
   logInfo " Quality matched: $movieQuality"
 }
@@ -301,9 +318,10 @@ function seeIfExistsTV1 {
     if [[ $sortInput =~ "PROPER" ]]; then
       logWarn " Deleting old version to make way for PROPER."
       rm "$tvDir/$tvName/Season $tvSeason/"*E$tvEpisode*
+    else
+      logError "Error 45 [Episode Already Exists] $sortInput"
+      error=45
     fi
-    logError "Error 45 [Episode Already Exists] $sortInput"
-    error=45
   else
     logInfo " Episode does not already exist. Proceeding."
   fi
@@ -355,20 +373,20 @@ function sortTV1 {
   if [[ $fileType == mkv ]] || [[ $fileType == mp4 ]] || [[ $fileType == avi ]]; then
     if [[ $folderOrFile == 1 ]]; then
       tvSource="$sortDir/$sortInput/$( ls -S $sortDir/$sortInput | grep $fileType | head -1 )"
-      tvTarget="$tvDir/$tvName/Season $tvSeason"
+      tvTarget="$tvDir/$tvName/Season $tvSeason/"
       logInfo " Copying '$tvSource' to '$tvTarget'"
       if [[ "$tvEpisode" == "01" ]]; then mkdir "$tvTarget" > /dev/null; fi
       cp "$tvSource" "$tvTarget"
     elif [[ $folderOrFile == 2 ]]; then
       tvSource="$sortDir/$sortInput"
-      tvTarget="$tvDir/$tvName/Season $tvSeason"
+      tvTarget="$tvDir/$tvName/Season $tvSeason/"
       logInfo " Copying '$tvSource' to '$tvTarget'"
       if [[ "$tvEpisode" == "01" ]]; then mkdir "$tvTarget" > /dev/null; fi
       cp "$tvSource" "$tvTarget"
     fi
   elif [[ $fileType == rar ]]; then
     tvSourceRar="$sortDir/$sortInput"
-    tvTarget="$tvDir/$tvName/Season $tvSeason"
+    tvTarget="$tvDir/$tvName/Season $tvSeason/"
     logInfo " Unraring '$tvSourceRar' archives to '$tvTarget'"
     unrar e "$tvSourceRar/*.rar" "$tvTarget" > /dev/null
   fi
@@ -380,12 +398,12 @@ function sortTV2 {
   if [[ $fileType == mkv ]] || [[ $fileType == mp4 ]] || [[ $fileType == avi ]]; then
     if [[ $folderOrFile == 1 ]]; then
       tvSource="$sortDir/$sortInput/$( ls -S $sortDir/$sortInput | grep $fileType | head -1 )"
-      tvTarget="$tvDir/$tvName/Season $tvYear"
+      tvTarget="$tvDir/$tvName/Season $tvYear/"
       logInfo " Copying '$tvSource' to '$tvTarget'"
       cp "$tvSource" "$tvTarget"
     elif [[ $folderOrFile == 2 ]]; then
       tvSource="$sortDir/$sortInput"
-      tvTarget="$tvDir/$tvName/Season $tvYear"
+      tvTarget="$tvDir/$tvName/Season $tvYear/"
       logInfo " Copying '$tvSource' to '$tvTarget'"
       cp "$tvSource" "$tvTarget"
     fi
