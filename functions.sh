@@ -132,6 +132,7 @@ function getTimeSinceModify {
   if [[ $timeSinceModify -gt 0 ]]; then
     logInfo " Modification time acquired."
     logInfo " timeSinceModify: $timeSinceModify"
+    logInfo " sortWaitTime: $sortWaitTime"
   else
     logWarn " Could not get modification time."
     logError "Error 12 [File Read Error] $sortInput"
@@ -222,8 +223,8 @@ function findMovieQuality {
   else
     logWarn " Could not find a valid quality."
     logError "Error 33 [Movie Quality Error] $sortInput"
-    sortError=33
     movieQuality="UNKNOWN"
+    sortError=33
   fi
 
   logInfo " Quality matched: $movieQuality"
@@ -327,6 +328,7 @@ function uploadDataOther {
 # SORT FUNCTIONS
 function seeIfExistsMovie {
   logInfo "Finding Movie..."
+
   if [[ -n $( find "$movieDir" -name "${movieName}*" ) ]]; then
     if [[ -n $( find "$movieDir" -name "${movieName}*CAM*" ) ]] && [[ $movieQuality == "720p" || $movieQuality == "1080p" ]]; then
       logWarn " Deleting CAM version to make way for $movieQuality version."
@@ -345,6 +347,7 @@ function seeIfExistsMovie {
 
 function seeIfExistsTV1 {
   logInfo "Finding Episode..."
+
   if [[ -n $( find "$tvDir/$tvName/Season $tvSeason" -name "*[Ee]${tvEpisode}*" 2> /dev/null ) ]]; then
     if [[ $sortInput =~ "PROPER" ]]; then
       logWarn " Deleting old version to make way for PROPER."
@@ -360,6 +363,7 @@ function seeIfExistsTV1 {
 
 function seeIfExistsTV2 {
   logInfo "Finding Episode..."
+
   if [[ -n $( find "$tvDir/$tvName/Season $tvYear" -name "*${tvDate}*" 2> /dev/null ) ]]; then
     logError "Error 45 [Episode Already Exists] $sortInput"
     sortError=45
@@ -370,57 +374,78 @@ function seeIfExistsTV2 {
 
 function sortMovie {
   logInfo "Sorting Movie..."
+
   movieFullname="$movieName [$movieYear] [$movieQuality]"
   if [[ $fileType == mkv ]] || [[ $fileType == mp4 ]] || [[ $fileType == avi ]]; then
     if [[ $folderOrFile == 1 ]]; then
       movieSource="$sortDir/$sortInput/$( ls -S $sortDir/$sortInput | grep $fileType | head -1 )"
       movieTarget="$movieDir/$movieFullname.$fileType"
+
       logInfo " Copying '$movieSource' to '$movieTarget'"
       cp "$movieSource" "$movieTarget"
+
     elif [[ $folderOrFile == 2 ]]; then
       movieSource="$sortDir/$sortInput"
       movieTarget="$movieDir/$movieFullname.$fileType"
+
       logInfo " Copying '$movieSource' to '$movieTarget'"
       cp "$movieSource" "$movieTarget"
+
     fi
   elif [[ $fileType == rar ]]; then
     tempDirActive="$tempDir/"
     for i in $( seq 8 ); do tempDirActive="${tempDirActive}$(( RANDOM % 10 ))"; done
     movieSourceRar="$sortDir/$sortInput"
     movieTarget="$movieDir/$movieFullname.mkv"
+
     logInfo " Unraring '$movieSourceRar' archives to '$tempDirActive'"
     mkdir "$tempDirActive"
     unrar e "$movieSourceRar/*.rar" "$tempDirActive" > /dev/null
+
     movieSource="$tempDirActive/$( ls -S $tempDirActive | head -1 )"
+
     logInfo " Moving '$movieSource' to '$movieTarget'"
     mv "$movieSource" "$movieTarget"
     rm -r "$tempDirActive"
+
   fi
   logInfo " Transfer complete."
 }
 
 function sortTV1 {
   logInfo "Sorting Episode..."
+
   if [[ $fileType == mkv ]] || [[ $fileType == mp4 ]] || [[ $fileType == avi ]]; then
     if [[ $folderOrFile == 1 ]]; then
+
       tvSource="$sortDir/$sortInput/$( ls -S $sortDir/$sortInput | grep $fileType | head -1 )"
       tvTarget="$tvDir/$tvName/Season $tvSeason/"
+
       logInfo " Copying '$tvSource' to '$tvTarget'"
+
       if [[ "$tvEpisode" == "01" ]]; then mkdir "$tvTarget" > /dev/null; fi
       cp "$tvSource" "$tvTarget"
+
     elif [[ $folderOrFile == 2 ]]; then
+
       tvSource="$sortDir/$sortInput"
       tvTarget="$tvDir/$tvName/Season $tvSeason/"
+
       logInfo " Copying '$tvSource' to '$tvTarget'"
+
       if [[ "$tvEpisode" == "01" ]]; then mkdir "$tvTarget" > /dev/null; fi
       cp "$tvSource" "$tvTarget"
+
     fi
   elif [[ $fileType == rar ]]; then
     tvSourceRar="$sortDir/$sortInput"
     tvTarget="$tvDir/$tvName/Season $tvSeason/"
     logInfo " Unraring '$tvSourceRar' archives to '$tvTarget'"
+
     unrar e "$tvSourceRar/*.rar" "$tvTarget" > /dev/null
+
   fi
+
   logInfo " Transfer complete."
 }
 
@@ -505,9 +530,9 @@ function updateInfoFailure {
 
   dbQuery="UPDATE $dbList SET sortError = \"$sortError\" WHERE id=\"$id\""
   doDbQuery
-  dbQuery="SELECT sortComplete FROM $dbList WHERE id=\"$id\""
+  dbQuery="SELECT sortError FROM $dbList WHERE id=\"$id\""
   doDbQuery
-  if [[ "$dbResult" == 1 ]]; then
+  if [[ "$dbResult" != "NULL" ]]; then
     logInfo " Status updated succeessfully."
   else
     logWarn " Could not update database."

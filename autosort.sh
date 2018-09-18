@@ -44,6 +44,7 @@ for sortInputRaw in "$sortDir"/*; do
     findFolderOrFile
     findFileType
     if [[ $sortError != -1 ]]; then
+      uploadDataOther
       continue
     fi
 
@@ -95,14 +96,21 @@ for sortInputRaw in "$sortDir"/*; do
   fi
 
   getTimeSinceModify
-  if [[ $timeSinceModify -gt $sortWaitTime ]]; then
+  if [[ $timeSinceModify -lt $sortWaitTime ]]; then
     logInfo " Skipping [Too Soon] $sortInput"
     continue
   fi
 
   logInfo "Sorting..."
 
+  getDbInfo
+
   if [[ $movieOrTV == 1 ]]; then
+
+    if [[ $movieQuality == "UNKNOWN" ]]; then
+      logInfo " Skipping [Low Quality] $sortInput"
+      continue
+    fi
 
     seeIfExistsMovie
     if [[ $sortError != -1 ]]; then
