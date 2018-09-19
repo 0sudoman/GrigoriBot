@@ -41,8 +41,8 @@ for sortInputRaw in "$sortDir"/*; do
   if [[ $isInDB == 0 ]]; then
     logInfo " Gathering data..."
 
-    findFolderOrFile
     findFileType
+    findFolderOrFile
     if [[ $sortError != -1 ]]; then
       uploadDataOther
       continue
