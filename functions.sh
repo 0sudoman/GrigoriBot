@@ -114,7 +114,21 @@ function getDbInfoPrelim {
 function getDbInfo {
   logInfo "Getting Database Info..."
 
-  for i in movieOrTV folderOrFile fileType movieName movieYear movieQuality tvStyle tvName tvSeason tvEpisode tvYear tvDate; do
+  #for i in movieOrTV folderOrFile fileType movieName movieYear movieQuality tvStyle tvName tvSeason tvEpisode tvYear tvDate
+  for i in \
+    movieOrTV \
+    folderOrFile \
+    fileType \
+    movieName \
+    movieYear \
+    movieQuality \
+    tvStyle \
+    tvName \
+    tvSeason \
+    tvEpisode \
+    tvYear \
+    tvDate
+  do
     dbQuery="SELECT $i FROM $dbList WHERE id=$id"
     doDbQuery
     declare -g $i="$dbResult"
@@ -216,14 +230,19 @@ function findMovieData {
 function findMovieQuality {
   logInfo "Finding Movie Quality..."
 
-  if [[ $sortInput =~ "DVD[Ss][Cc][Rr]" ]] || [[ $sortInput =~ "HC" ]] || [[ $sortInput =~ "CAM" ]]; then
-    movieQuality="CAM"
+  if [[ $sortInput =~ "DVD[Ss][Cc][Rr]" ]] || \
+    [[ $sortInput =~ "HC" ]] || \
+    [[ $sortInput =~ "CAM" ]] || \
+    [[ $sortInput =~ "BLUR" ]] || \
+    [[ $sortInput =~ "TC" ]]
+    then movieQuality="CAM"
   elif [[ $sortInput =~ "720p" ]]; then movieQuality="720p"
   elif [[ $sortInput =~ "1080p" ]]; then movieQuality="1080p"
   else
     logWarn " Could not find a valid quality."
     #logError "Error 33 [Movie Quality Error] $sortInput"
     movieQuality="UNKNOWN"
+    movieOrTV=3
     sortError=33
   fi
 
