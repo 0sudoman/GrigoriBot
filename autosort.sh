@@ -42,7 +42,26 @@ for sortInputRaw in "$sortDir"/*; do
     continue
   fi
 
-  getDbInfoPrelim
+  getDbInfoID
+
+  getDbInfoComplete
+  if [[ $sortComplete == 1 ]]; then
+    logInfo " Skipping [Complete] $sortInput"
+    continue
+  fi
+
+  getDbInfoPotential
+  if [[ $sortPotential == 0 ]]; then
+    logInfo " Skipping [Disabled] $sortInput"
+    continue
+  fi
+
+  getDbInfoError
+  if [[ $sortError != -1 ]]; then
+    logInfo " Skipping [Error] $sortInput"
+    continue
+  fi
+
   if [[ $isInDB == 0 ]]; then
     logInfo " Gathering data..."
 
@@ -83,18 +102,6 @@ for sortInputRaw in "$sortDir"/*; do
 
   fi
 
-  if [[ $sortComplete == 1 ]]; then
-    logInfo " Skipping [Complete] $sortInput"
-    continue
-  fi
-  if [[ $sortPotential == 0 ]]; then
-    logInfo " Skipping [Disabled] $sortInput"
-    continue
-  fi
-  if [[ $sortError != -1 ]]; then
-    logInfo " Skipping [Error] $sortInput"
-    continue
-  fi
   if [[ $movieOrTV == 3 ]]; then
     logInfo " Skipping [Unsortable] $sortInput"
     continue

@@ -85,8 +85,8 @@ function fixSortInput {
   fi
 }
 
-function getDbInfoPrelim {
-  logInfo "Getting Preliminary Database Info..."
+function getDbInfoID {
+  logInfo "Getting ID..."
   dbQuery="SELECT id FROM $dbList WHERE sortInput=\"$sortInput\""
   doDbQuery
   id="$dbResult"
@@ -94,21 +94,35 @@ function getDbInfoPrelim {
   if [[ "$id" != "" ]]; then
     isInDB=1
     logInfo " id: $id"
-
-    for i in sortPotential sortComplete sortError; do
-      dbQuery="SELECT $i FROM $dbList WHERE id=$id"
-      doDbQuery
-      declare -g $i="$dbResult"
-      logInfo " $i: ${!i}"
-    done
-
-    if [[ $sortError == "NULL" ]]; then sortError=-1; fi
-    logInfo " Preliminary database information acquired."
-
   else
     isInDB=0
     logInfo " Could not find information in database."
   fi
+}
+
+function getDbInfoPotential {
+  logInfo "Getting Preliminary Database Info [Potential]..."
+  dbQuery="SELECT sortPotential FROM $dbList WHERE id=$id"
+  doDbQuery
+  sortPotential="$dbResult"
+  logInfo " sortPotential: $sortPotential"
+}
+
+function getDbInfoComplete {
+  logInfo "Getting Preliminary Database Info [Complete]..."
+  dbQuery="SELECT sortComplete FROM $dbList WHERE id=$id"
+  doDbQuery
+  sortComplete="$dbResult"
+  logInfo " sortComplete: $sortComplete"
+}
+
+function getDbInfoError {
+  logInfo "Getting Preliminary Database Info [Error]..."
+  dbQuery="SELECT sortError FROM $dbList WHERE id=$id"
+  doDbQuery
+  sortError="$dbResult"
+  if [[ $sortError == "NULL" ]]; then sortError=-1; fi
+  logInfo " sortError: $sortError"
 }
 
 function getDbInfo {
