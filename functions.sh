@@ -164,7 +164,7 @@ function findFileType {
   elif [[ -n $( find "$sortDir/$sortInput" -name "*.avi" ) ]]; then fileType="avi";
   else
     logWarn " Could not find a video file/archive. Are you sure the file exists?"
-    logError "Error 34 [Filetype Error] $sortInput"
+    #logError "Error 34 [Filetype Error] $sortInput"
     sortError=34
   fi
 

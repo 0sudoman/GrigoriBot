@@ -37,6 +37,11 @@ for sortInputRaw in "$sortDir"/*; do
 
   logInfo "Handling file: $sortInput"
 
+  if [[ $sortInput =~ "’" ]]; then
+    logWarn " Skipping [Illegal Character] $sortInput"
+    continue
+  fi
+
   getDbInfoPrelim
   if [[ $isInDB == 0 ]]; then
     logInfo " Gathering data..."
