@@ -128,7 +128,6 @@ function getDbInfoError {
 function getDbInfo {
   logInfo "Getting Database Info..."
 
-  #for i in movieOrTV folderOrFile fileType movieName movieYear movieQuality tvStyle tvName tvSeason tvEpisode tvYear tvDate
   for i in \
     movieOrTV \
     folderOrFile \
@@ -382,8 +381,8 @@ function seeIfExistsTV1 {
   logInfo "Finding Episode..."
 
   if [[ -n $( find "$tvDir/$tvName/Season $tvSeason" -name "*[Ee]${tvEpisode}*" 2> /dev/null ) ]]; then
-    if [[ $sortInput =~ "PROPER" ]]; then
-      logWarn " Deleting old version to make way for PROPER."
+    if [[ $sortInput =~ "PROPER" ]] || [[ $sortInput =~ "REPACK" ]]; then
+      logWarn " Deleting old version to make way for a new one."
       rm "$tvDir/$tvName/Season $tvSeason/"*E$tvEpisode*
     else
       #logError "Error 45 [Episode Already Exists] $sortInput"
