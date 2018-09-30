@@ -105,6 +105,7 @@ function getDbInfoPotential {
   dbQuery="SELECT sortPotential FROM $dbList WHERE id=$id"
   doDbQuery
   sortPotential="$dbResult"
+  if [[ $sortPotential == "NULL" ]] || [[ $sortPotential == "" ]]; then sortError=$sortDefault; fi
   logInfo " sortPotential: $sortPotential"
 }
 

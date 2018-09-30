@@ -82,6 +82,12 @@ for sortInputRaw in "$sortDir"/*; do
 
     fi
 
+    getDbInfoPotential
+    if [[ $sortPotential == 0 ]]; then
+      logInfo " Skipping [Disabled] $sortInput"
+      continue
+    fi
+
   else
 
     getDbInfoComplete
@@ -96,14 +102,14 @@ for sortInputRaw in "$sortDir"/*; do
       continue
     fi
 
+    getDbInfoPotential
+    if [[ $sortPotential == 0 ]]; then
+      logInfo " Skipping [Disabled] $sortInput"
+      continue
+    fi
+
     getDbInfo
 
-  fi
-
-  getDbInfoPotential
-  if [[ $sortPotential == 0 ]]; then
-    logInfo " Skipping [Disabled] $sortInput"
-    continue
   fi
 
   if [[ $movieOrTV == 3 ]]; then
