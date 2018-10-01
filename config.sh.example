@@ -107,3 +107,13 @@ discordChannel=""                    #channel id
 
 # PUSHBULLET SETTINGS
 pushDir="/opt/pushbullet-bash"       #where the pushbullet-bash file is stored
+
+# DATABASE SETTINGS
+dbHostname="db.example.com"          #address of the server hostuing the database
+dbUsername="username"                #username for the database
+dbPassword="password"                #password for the database
+dbDatabase="database"                #database name
+dbSettings="dbSettings"              #table with settings
+dbList="dbList"                      #table with sort items
+
+dbCommand="mysql -u $dbUsername -p$dbPassword -h $dbHostname -D $dbDatabase -sNe"
