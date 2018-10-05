@@ -47,6 +47,9 @@ for sortInputRaw in "$sortDir"/*; do
   if [[ $isInDB == 0 ]]; then
     logInfo " Gathering data..."
 
+    sortPotential=$sortDefault
+    logInfo " sortPotential: $sortPotential (from default)"
+
     findFileType
     findFolderOrFile
     if [[ $sortError != -1 ]]; then
@@ -82,7 +85,6 @@ for sortInputRaw in "$sortDir"/*; do
 
     fi
 
-    getDbInfoPotential
     if [[ $sortPotential == 0 ]]; then
       logInfo " Skipping [Disabled] $sortInput"
       continue
@@ -96,15 +98,15 @@ for sortInputRaw in "$sortDir"/*; do
       continue
     fi
 
-    getDbInfoError
-    if [[ $sortError != -1 ]]; then
-      logInfo " Skipping [Error] $sortInput"
-      continue
-    fi
-
     getDbInfoPotential
     if [[ $sortPotential == 0 ]]; then
       logInfo " Skipping [Disabled] $sortInput"
+      continue
+    fi
+
+    getDbInfoError
+    if [[ $sortError != -1 ]]; then
+      logInfo " Skipping [Error] $sortInput"
       continue
     fi
 
