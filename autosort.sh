@@ -16,11 +16,13 @@ resetVariables
 
 pingServer
 if [[ $sortError != -1 ]]; then
+  logWarn " Exiting [Server Connect Error]"
   autosortExit
 fi
 
 getSettings
 if [[ $sortError != -1 ]]; then
+  logWarn " Exiting [Server Connect Error]"
   autosortExit
 fi
 
@@ -32,6 +34,7 @@ for sortInputRaw in "$sortDir"/*; do
 
   fixSortInput
   if [[ $sortError != -1 ]]; then
+    logWarn " Skipping [Sort Input Error] $sortInputRaw"
     continue
   fi
 
@@ -54,6 +57,7 @@ for sortInputRaw in "$sortDir"/*; do
     findFolderOrFile
     if [[ $sortError != -1 ]]; then
       uploadDataOther
+      logWarn " $sortInput complete. Moving on."
       continue
     fi
 
@@ -63,12 +67,14 @@ for sortInputRaw in "$sortDir"/*; do
       findMovieData
       if [[ $sortError != -1 ]]; then
         uploadDataOther
+        logInfo " $sortInput complete. Moving on."
         continue
       fi
 
       findMovieQuality
       if [[ $sortError != -1 ]]; then
         uploadDataOther
+        logInfo " $sortInput complete. Moving on."
         continue
       fi
 
@@ -85,6 +91,8 @@ for sortInputRaw in "$sortDir"/*; do
 
     fi
 
+    getDbInfoID
+
     if [[ $sortPotential == 0 ]]; then
       logInfo " Skipping [Disabled] $sortInput"
       continue
@@ -92,15 +100,15 @@ for sortInputRaw in "$sortDir"/*; do
 
   else
 
-    getDbInfoComplete
-    if [[ $sortComplete == 1 ]]; then
-      logInfo " Skipping [Complete] $sortInput"
-      continue
-    fi
-
     getDbInfoPotential
     if [[ $sortPotential == 0 ]]; then
       logInfo " Skipping [Disabled] $sortInput"
+      continue
+    fi
+
+    getDbInfoComplete
+    if [[ $sortComplete == 1 ]]; then
+      logInfo " Skipping [Complete] $sortInput"
       continue
     fi
 
@@ -136,6 +144,7 @@ for sortInputRaw in "$sortDir"/*; do
 
     seeIfExistsMovie
     if [[ $sortError != -1 ]]; then
+      logWarn " $sortInput complete [Already Exists]. Moving on."
       continue
     fi
 
@@ -151,6 +160,7 @@ for sortInputRaw in "$sortDir"/*; do
 
     seeIfExistsTV1
     if [[ $sortError != -1 ]]; then
+      logWarn " $sortInput complete [Already Exists]. Moving on."
       continue
     fi
 
@@ -166,6 +176,7 @@ for sortInputRaw in "$sortDir"/*; do
 
     seeIfExistsTV2
     if [[ $sortError != -1 ]]; then
+      logWarn " $sortInput complete [Already Exists]. Moving on."
       continue
     fi
 

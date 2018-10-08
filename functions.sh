@@ -4,6 +4,8 @@
 
 # PRECURSOR FUNCTIONS
 function resetVariables {
+  id="XXXX"
+
   movieOrTV=-1
   folderOrFile=-1
   fileType=-1
@@ -55,7 +57,7 @@ function getSettings {
   logInfo "Getting Settings..."
 
   for i in sortDefault sortWaitTime; do
-    dbQuery="SELECT $i FROM $dbSettings WHERE id=1"
+    dbQuery="SELECT value FROM $dbSettings WHERE setting='$i'"
     doDbQuery
     declare -g $i="$dbResult"
     logInfo " $i: ${!i}"
@@ -88,6 +90,7 @@ function fixSortInput {
 function getDbInfoID {
   logInfo "Getting ID..."
   dbQuery="SELECT id FROM $dbList WHERE sortInput=\"$sortInput\""
+  id="XXXX"
   doDbQuery
   id="$dbResult"
 
@@ -96,6 +99,7 @@ function getDbInfoID {
     logInfo " id: $id"
   else
     isInDB=0
+    id="XXXX"
     logInfo " Could not find information in database."
   fi
 }
@@ -370,6 +374,7 @@ function seeIfExistsMovie {
       logWarn " Deleting 720p version to make way for $movieQuality version."
       rm "$movieDir/$movieName"*720p*
     else
+      logWarn "Movie already exists."
       #logError "Error 46 [Movie Already Exists] $sortInput"
       sortError=46
     fi
@@ -386,6 +391,7 @@ function seeIfExistsTV1 {
       logWarn " Deleting old version to make way for a new one."
       rm "$tvDir/$tvName/Season $tvSeason/"*E$tvEpisode*
     else
+      logWarn "Episode already exists."
       #logError "Error 45 [Episode Already Exists] $sortInput"
       sortError=45
     fi
@@ -398,6 +404,7 @@ function seeIfExistsTV2 {
   logInfo "Finding Episode..."
 
   if [[ -n $( find "$tvDir/$tvName/Season $tvYear" -name "*${tvDate}*" 2> /dev/null ) ]]; then
+    logWarn "Episode already exists."
     #logError "Error 45 [Episode Already Exists] $sortInput"
     sortError=45
   else
