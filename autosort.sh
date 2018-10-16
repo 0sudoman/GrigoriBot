@@ -66,6 +66,9 @@ for sortInputRaw in "$sortDir"/*; do
 
       findMovieData
       if [[ $sortError != -1 ]]; then
+        sortPotential=0
+        logInfo "Changing sortPotential to 0..."
+        logInfo " sortPotential: $sortPotential"
         uploadDataOther
         logInfo " $sortInput complete. Moving on."
         continue
@@ -73,6 +76,9 @@ for sortInputRaw in "$sortDir"/*; do
 
       findMovieQuality
       if [[ $sortError != -1 ]]; then
+        sortPotential=0
+        logInfo "Changing sortPotential to 0..."
+        logInfo " sortPotential: $sortPotential"
         uploadDataOther
         logInfo " $sortInput complete. Moving on."
         continue
