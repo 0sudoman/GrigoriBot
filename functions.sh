@@ -297,7 +297,7 @@ function findTvData {
 function uploadDataMovie {
   logInfo "Uploading Information to Database..."
 
-  dbQuery="INSERT INTO sortList (sortInput, movieOrTV, folderOrFile, fileType, movieName, movieYear, movieQuality, sortPotential) VALUES (\"$sortInput\", \"1\", \"$folderOrFile\", \"$fileType\", \"$movieName\", \"$movieYear\", \"$movieQuality\", \"$sortDefault\")"
+  dbQuery="INSERT INTO sortList (sortInput, movieOrTV, folderOrFile, fileType, movieName, movieYear, movieQuality, sortPotential) VALUES (\"$sortInput\", \"1\", \"$folderOrFile\", \"$fileType\", \"$movieName\", \"$movieYear\", \"$movieQuality\", \"$sortPotential\")"
   doDbQuery
 
   dbQuery="SELECT id FROM $dbList WHERE sortInput=\"$sortInput\""
@@ -314,7 +314,7 @@ function uploadDataMovie {
 function uploadDataTV1 {
   logInfo "Uploading Information to Database..."
 
-  dbQuery="INSERT INTO sortList (sortInput, movieOrTV, folderOrFile, fileType, tvStyle, tvName, tvSeason, tvEpisode, sortPotential) VALUES (\"$sortInput\", \"$movieOrTV\", \"$folderOrFile\", \"$fileType\", \"$tvStyle\", \"$tvName\", \"$tvSeason\", \"$tvEpisode\", \"$sortDefault\")"
+  dbQuery="INSERT INTO sortList (sortInput, movieOrTV, folderOrFile, fileType, tvStyle, tvName, tvSeason, tvEpisode, sortPotential) VALUES (\"$sortInput\", \"$movieOrTV\", \"$folderOrFile\", \"$fileType\", \"$tvStyle\", \"$tvName\", \"$tvSeason\", \"$tvEpisode\", \"$sortPotential\")"
   doDbQuery
 
   dbQuery="SELECT id FROM $dbList WHERE sortInput=\"$sortInput\""
@@ -331,7 +331,7 @@ function uploadDataTV1 {
 function uploadDataTV2 {
   logInfo "Uploading Information to Database..."
 
-  dbQuery="INSERT INTO sortList (sortInput, movieOrTV, folderOrFile, fileType, tvStyle, tvName, tvYear, tvDate, sortPotential) VALUES (\"$sortInput\", \"$movieOrTV\", \"$folderOrFile\", \"$fileType\", \"$tvStyle\", \"$tvName\", \"$tvYear\", \"$tvDate\", \"$sortDefault\")"
+  dbQuery="INSERT INTO sortList (sortInput, movieOrTV, folderOrFile, fileType, tvStyle, tvName, tvYear, tvDate, sortPotential) VALUES (\"$sortInput\", \"$movieOrTV\", \"$folderOrFile\", \"$fileType\", \"$tvStyle\", \"$tvName\", \"$tvYear\", \"$tvDate\", \"$sortPotential\")"
   doDbQuery
 
   dbQuery="SELECT id FROM $dbList WHERE sortInput=\"$sortInput\""
@@ -348,7 +348,7 @@ function uploadDataTV2 {
 function uploadDataOther {
   logInfo "Uploading Information to Database..."
 
-  dbQuery="INSERT INTO sortList (sortInput, movieOrTV, folderOrFile, sortPotential) VALUES (\"$sortInput\", \"$movieOrTV\", \"$folderOrFile\", \"$sortDefault\")"
+  dbQuery="INSERT INTO sortList (sortInput, movieOrTV, folderOrFile, sortPotential) VALUES (\"$sortInput\", \"$movieOrTV\", \"$folderOrFile\", \"$sortPotential\")"
   doDbQuery
 
   dbQuery="SELECT id FROM $dbList WHERE sortInput=\"$sortInput\""
