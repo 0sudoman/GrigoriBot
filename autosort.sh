@@ -56,6 +56,9 @@ for sortInputRaw in "$sortDir"/*; do
     findFileType
     findFolderOrFile
     if [[ $sortError != -1 ]]; then
+      sortPotential=0
+      logInfo "Changing sortPotential to 0..."
+      logInfo " sortPotential: $sortPotential"
       uploadDataOther
       logWarn " $sortInput complete. Moving on."
       continue
