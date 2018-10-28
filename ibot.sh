@@ -9,21 +9,18 @@ scriptName="ibot.sh"
 logInfo "Started"
 
 rejoinTime=$( date +%s )
+echo "/j $ircChannel" > $iiDir/$ircServer/in
 
-while true; do
+while inotifywait -q -e modify "$ircDir/out" >/dev/null; do
 
-# grab a new line
-newLine="$( tail -n1 $ircDir/out )"
-if [[ "$newLine" != "$line" ]]; then
-  line="$newLine"
-  "$botDir/bot.sh" "$line"
-fi
+  newLine="$( tail -n1 $ircDir/out )"
+  if [[ "$newLine" != "$line" ]]; then
+    line="$newLine"
+    "$botDir/bot.sh" "$line"
+  fi
 
-# join the channel
-if [[ $( date +%s ) == $rejoinTime ]] || [[ $line =~ "kicked $botNick" ]]; then
-  rejoinTime=$( expr $( date +%s ) + $ircJoinDelay )
-  echo "/j $ircChannel" > $iiDir/$ircServer/in
-  echo "nothing" >> $iiDir/out  #super hacky way to prevent flooding
-fi
-
+  if [[ $( date +%s ) -ge $rejoinTime ]] || [[ $line =~ "kicked $botNick" ]]; then
+    echo "/j $ircChannel" > $iiDir/$ircServer/in
+    rejoinTime=$( expr $( date +%s ) + $ircJoinDelay )
+  fi
 done

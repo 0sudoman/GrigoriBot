@@ -8,16 +8,23 @@ source "$botDir/config.sh"
 scriptName="bot.sh"
 
 ircLine="$1"
+
+logInfo "New IRC line detected."
+
 if [[ "$ircLine" =~ ^.{17}\<(.*)\>\ (.*)$ ]]; then
   ircSender="${BASH_REMATCH[1]}"
   ircMessage="${BASH_REMATCH[2]}"
 fi
+logInfo " ircSender: $ircSender"
+
 if [[ "$ircMessage" =~ ^(.*)\ (.*)$ ]]; then
   ircCommand="${BASH_REMATCH[1],,}"
   ircExtra="${BASH_REMATCH[2]}"
 else
   ircCommand="${ircMessage,,}"
 fi
+logInfo " ircCommand: $ircCommand"
+logInfo " ircExtra: $ircExtra"
 
 if [[ "$ircSender" != "$botNick" ]]; then
 
@@ -26,8 +33,8 @@ if [[ "$ircCommand" == "!help" ]]; then sendToIRC "You can find my docs at https
 if [[ "$ircCommand" == "!source" ]]; then sendToIRC "https://github.com/0sudoman/GrigoriBot"; fi
 if [[ "$ircCommand" == "!fortune" ]]; then sendToIRC "$(fortune)"; fi
 if [[ "$ircCommand" == "!freespace" ]]; then sendToIRC "$(df -h | grep md0p1)"; fi
-if [[ "$ircCommand" == "${BOTNICK,,}++" ]]; then sendToIRC ":D"; fi
-if [[ "$ircCommand" == "${BOTNICK,,}--" ]]; then sendToIRC "D:"; fi
+if [[ "$ircCommand" == "${botNick,,}++" ]]; then sendToIRC ":D"; fi
+if [[ "$ircCommand" == "${botNick,,}--" ]]; then sendToIRC "D:"; fi
 
 # admin commands
 if [[ "$ircSender" == "$ircAdmin" ]]; then

@@ -209,7 +209,7 @@ function findMovieOrTV {
   for sampleFile in "$tvDir"/*; do
     if [[ "$sampleFile" =~ .{${#tvDir}}.(.*)$ ]]; then tvNameTest="${BASH_REMATCH[1]}"; fi
     if [[ "$sampleFile" =~ .{${#tvDir}}.(.{1,17}) ]]; then sampleMod="${BASH_REMATCH[1]}"; fi
-    sampleMod=${sampleMod//\./} && sampleMod=${sampleMod//\ /\.}
+    sampleMod=${sampleMod//\./} && sampleMod=${sampleMod//\ /\.} && sampleMod=${sampleMod/\,/}
     sampleMod=${sampleMod/\'/} && sampleMod=${sampleMod/\(/} && sampleMod=${sampleMod/\)/}
     inputMod=${sortInput/\'/}
     if [[ "${inputMod,,}" =~ ^"${sampleMod,,}" ]]; then
