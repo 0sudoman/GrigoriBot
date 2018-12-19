@@ -209,9 +209,13 @@ function findMovieOrTV {
   for sampleFile in "$tvDir"/*; do
     if [[ "$sampleFile" =~ .{${#tvDir}}.(.*)$ ]]; then tvNameTest="${BASH_REMATCH[1]}"; fi
     if [[ "$sampleFile" =~ .{${#tvDir}}.(.{1,17}) ]]; then sampleMod="${BASH_REMATCH[1]}"; fi
-    sampleMod=${sampleMod//\./} && sampleMod=${sampleMod//\ /\.} && sampleMod=${sampleMod/\,/}
-    sampleMod=${sampleMod/\'/} && sampleMod=${sampleMod/\(/} && sampleMod=${sampleMod/\)/}
-    inputMod=${sortInput/\'/}
+    sampleMod=${sampleMod/\(/} && sampleMod=${sampleMod/\)/} # remove parentheses
+    sampleMod=${sampleMod//\./}    # remove dots
+    sampleMod=${sampleMod/\,/}     # remove commas
+    sampleMod=${sampleMod/\'/}     # remove apostrophes (sample)
+    inputMod=${sortInput/\'/}      # remove apostrophes (imput)
+    inputMod=${sortInput/_/}       # remove underscores
+    sampleMod=${sampleMod//\ /\.}  # convert spaces to dots
     if [[ "${inputMod,,}" =~ ^"${sampleMod,,}" ]]; then
       tvName="$tvNameTest"
       break
@@ -418,7 +422,7 @@ function sortMovie {
   movieFullname="$movieName [$movieYear] [$movieQuality]"
   if [[ $fileType == mkv ]] || [[ $fileType == mp4 ]] || [[ $fileType == avi ]]; then
     if [[ $folderOrFile == 1 ]]; then
-      movieSource="$sortDir/$sortInput/$( ls -S $sortDir/$sortInput | grep $fileType | head -1 )"
+      movieSource="$sortDir/$sortInput/$( ls -S "$sortDir/$sortInput" | grep $fileType | head -1 )"
       movieTarget="$movieDir/$movieFullname.$fileType"
 
       logInfo " Copying '$movieSource' to '$movieTarget'"

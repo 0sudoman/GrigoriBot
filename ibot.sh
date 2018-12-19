@@ -9,6 +9,7 @@ scriptName="ibot.sh"
 logInfo "Started"
 
 rejoinTime=$( date +%s )
+sleep $ircJoinDelay
 echo "/j $ircChannel" > $iiDir/$ircServer/in
 
 while inotifywait -q -e modify "$ircDir/out" >/dev/null; do

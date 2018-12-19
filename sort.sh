@@ -36,7 +36,7 @@ if [[ $sortError == -1 ]]; then
   if [[ $movieOrTV == 1 ]]; then
     seeIfExistsMovie
     if [[ $sortError != -1 ]]; then
-      continue
+      exit
     fi
     sortMovie
     verifyMovie
