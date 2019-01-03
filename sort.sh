@@ -28,6 +28,14 @@ findMovieOrTV
 if [[ $movieOrTV == 1 ]]; then
   findMovieData
   findMovieQuality
+
+  if [[ $movieQuality == "UNKNOWN" ]]; then
+    movieOrTV=1
+    movieQuality="CAM"
+    sortError=-1
+    logInfo " Quality Overridden to CAM."
+  fi
+
 elif [[ $movieOrTV == 2 ]]; then
   findTvData
 fi

@@ -370,11 +370,11 @@ function uploadDataOther {
 function seeIfExistsMovie {
   logInfo "Finding Movie..."
 
-  if [[ -n $( find "$movieDir" -name "${movieName}*" ) ]]; then
-    if [[ -n $( find "$movieDir" -name "${movieName}*CAM*" ) ]] && [[ $movieQuality == "720p" || $movieQuality == "1080p" ]]; then
+  if [[ -n $( find "$movieDir" -iname "${movieName}*" ) ]]; then
+    if [[ -n $( find "$movieDir" -iname "${movieName}*CAM*" ) ]] && [[ $movieQuality == "720p" || $movieQuality == "1080p" ]]; then
       logWarn " Deleting CAM version to make way for $movieQuality version."
       rm "$movieDir/$movieName"*CAM*
-    elif [[ -n $( find "$movieDir" -name "${moviename}*720p*" ) ]] && [[ $movieQuality == "1080p" ]]; then
+    elif [[ -n $( find "$movieDir" -iname "${movieName}*720p*" ) ]] && [[ $movieQuality == "1080p" ]]; then
       logWarn " Deleting 720p version to make way for $movieQuality version."
       rm "$movieDir/$movieName"*720p*
     else
@@ -519,7 +519,7 @@ function sortTV2 {
 # VERIFY FUNCTIONS
 function verifyMovie {
   logInfo "Finding Movie..."
-  if [[ -n $( find "$movieDir" -name "${movieName}*" ) ]]; then
+  if [[ -n $( find "$movieDir" -iname "${movieName}*" ) ]]; then
     logInfo " Movie transferred successfully"
     logSuccess "New Movie: $movieFullname"
   else
