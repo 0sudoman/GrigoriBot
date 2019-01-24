@@ -161,7 +161,7 @@ function getTimeSinceModify {
   logInfo "Getting time since last modification..."
 
   timeSinceModify=$(( $( date +%s ) - $( date -r "$sortDir/$sortInput" +%s ) ))
-  if [[ $timeSinceModify -gt 0 ]]; then
+  if [[ $timeSinceModify -ge 0 ]]; then
     logInfo " Modification time acquired."
     logInfo " timeSinceModify: $timeSinceModify"
     logInfo " sortWaitTime: $sortWaitTime"
