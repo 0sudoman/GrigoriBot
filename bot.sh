@@ -32,7 +32,7 @@ if [[ "$ircSender" != "$botNick" ]]; then
 if [[ "$ircCommand" == "!help" ]]; then sendToIRC "You can find my docs at https://github.com/0sudoman/GrigoriBot/blob/master/docs.md"; fi
 if [[ "$ircCommand" == "!source" ]]; then sendToIRC "https://github.com/0sudoman/GrigoriBot"; fi
 if [[ "$ircCommand" == "!fortune" ]]; then sendToIRC "$(fortune)"; fi
-if [[ "$ircCommand" == "!freespace" ]]; then sendToIRC "$(df -h | grep md0p1)"; fi
+if [[ "$ircCommand" == "!freespace" ]]; then sendToIRC "Free Space on $(df -h | grep md0p1)"; fi
 if [[ "$ircCommand" == "${botNick,,}++" ]]; then sendToIRC ":D"; fi
 if [[ "$ircCommand" == "${botNick,,}--" ]]; then sendToIRC "D:"; fi
 

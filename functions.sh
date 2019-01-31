@@ -252,11 +252,12 @@ function findMovieData {
 function findMovieQuality {
   logInfo "Finding Movie Quality..."
 
-  if [[ $sortInput =~ "DVD[Ss][Cc][Rr]" ]] || \
-    [[ $sortInput =~ "HC" ]] || \
-    [[ $sortInput =~ "CAM" ]] || \
-    [[ $sortInput =~ "BLUR" ]] || \
-    [[ $sortInput =~ "TC" ]]
+  if [[ ${sortInput,,} =~ "dvdscr" ]] || \
+    [[ ${sortInput,,} =~ "hc" ]] || \
+    [[ ${sortInput,,} =~ "cam" ]] || \
+    [[ ${sortInput,,} =~ "blur" ]] || \
+    [[ ${sortInput,,} =~ "tc" ]] || \
+    [[ ${sortInput,,} =~ "sub" ]]
     then movieQuality="CAM"
   elif [[ $sortInput =~ "720p" ]]; then movieQuality="720p"
   elif [[ $sortInput =~ "1080p" ]]; then movieQuality="1080p"
