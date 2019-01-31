@@ -253,11 +253,10 @@ function findMovieQuality {
   logInfo "Finding Movie Quality..."
 
   if [[ ${sortInput,,} =~ "dvdscr" ]] || \
-    [[ ${sortInput,,} =~ "hc" ]] || \
+    [[ ${sortInput,,} =~ "sub" ]] || \
     [[ ${sortInput,,} =~ "cam" ]] || \
-    [[ ${sortInput,,} =~ "blur" ]] || \
     [[ ${sortInput,,} =~ "tc" ]] || \
-    [[ ${sortInput,,} =~ "sub" ]]
+    [[ ${sortInput,,} =~ "hc" ]]
     then movieQuality="CAM"
   elif [[ $sortInput =~ "720p" ]]; then movieQuality="720p"
   elif [[ $sortInput =~ "1080p" ]]; then movieQuality="1080p"
