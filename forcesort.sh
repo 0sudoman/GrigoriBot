@@ -1,12 +1,12 @@
 #!/bin/bash
-# sort.sh
-# sorts out TV shows and shit
+# forcesort.sh
+# sorts out files, ignoring certain errors
 
 # STARTUP INFO
 botDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$botDir/config.sh"
 source "$botDir/functions.sh"
-scriptName="sort.sh"
+scriptName="forcesort.sh"
 logInfo "Started..."
 
 sortArgs=("$@")
@@ -30,7 +30,11 @@ if [[ $movieOrTV == 1 ]]; then
   findMovieQuality
 
   if [[ $movieQuality == "UNKNOWN" ]]; then
-    exit
+    logInfo " Error ignored."
+    movieOrTV=1
+    movieQuality="CAM"
+    sortError=-1
+    logInfo " Quality Overridden to CAM."
   fi
 
 elif [[ $movieOrTV == 2 ]]; then
@@ -41,7 +45,7 @@ if [[ $sortError == -1 ]]; then
   if [[ $movieOrTV == 1 ]]; then
     seeIfExistsMovie
     if [[ $sortError != -1 ]]; then
-      exit
+      logInfo " Error ignored."
     fi
     sortMovie
     verifyMovie
