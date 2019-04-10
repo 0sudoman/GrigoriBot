@@ -212,6 +212,7 @@ function findMovieOrTV {
     sampleMod=${sampleMod/\(/} && sampleMod=${sampleMod/\)/} # remove parentheses
     sampleMod=${sampleMod//\./}    # remove dots
     sampleMod=${sampleMod/\,/}     # remove commas
+    sampleMod=${sampleMod/\!/}     # remove bangs
     sampleMod=${sampleMod/\'/}     # remove apostrophes (sample)
     inputMod=${sortInput/\'/}      # remove apostrophes (imput)
     inputMod=${sortInput/_/}       # remove underscores
@@ -260,6 +261,7 @@ function findMovieQuality {
     then movieQuality="CAM"
   elif [[ $sortInput =~ "720p" ]]; then movieQuality="720p"
   elif [[ $sortInput =~ "1080p" ]]; then movieQuality="1080p"
+  elif [[ $sortInput =~ "2160p" ]]; then movieQuality="2160p"
   else
     logWarn " Could not find a valid quality."
     #logError "Error 33 [Movie Quality Error] $sortInput"
@@ -352,7 +354,7 @@ function uploadDataTV2 {
 function uploadDataOther {
   logInfo "Uploading Information to Database..."
 
-  dbQuery="INSERT INTO sortList (sortInput, movieOrTV, folderOrFile, sortPotential) VALUES (\"$sortInput\", \"$movieOrTV\", \"$folderOrFile\", \"$sortPotential\")"
+  dbQuery="INSERT INTO sortList (sortInput, movieOrTV, folderOrFile, fileType, sortPotential) VALUES (\"$sortInput\", \"$movieOrTV\", \"$folderOrFile\", \"$fileType\", \"$sortPotential\")"
   doDbQuery
 
   dbQuery="SELECT id FROM $dbList WHERE sortInput=\"$sortInput\""

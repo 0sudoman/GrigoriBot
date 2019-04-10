@@ -87,6 +87,13 @@ for sortInputRaw in "$sortDir"/*; do
         continue
       fi
 
+     if [[ $movieQuality == "2160p" ]]; then
+        logWarn "Too high quality to sort automatically."
+        sortPotential=0
+        logInfo "Changing sortPotential to 0..."
+        logInfo " sortPotential: $sortPotential"
+      fi
+
       uploadDataMovie
 
     else
