@@ -372,13 +372,13 @@ function uploadDataOther {
 function seeIfExistsMovie {
   logInfo "Finding Movie..."
 
-  if [[ -n $( find "$movieDir" -iname "${movieName}*" ) ]]; then
-    if [[ -n $( find "$movieDir" -iname "${movieName}*CAM*" ) ]] && [[ $movieQuality == "720p" || $movieQuality == "1080p" ]]; then
+  if [[ -n $( find "$movieDir" -iname "${movieName}*${movieYear}" ) ]]; then
+    if [[ -n $( find "$movieDir" -iname "${movieName}*${movieYear}*CAM*" ) ]] && [[ $movieQuality == "720p" || $movieQuality == "1080p" ]]; then
       logWarn " Deleting CAM version to make way for $movieQuality version."
-      rm "$movieDir/$movieName"*CAM*
-    elif [[ -n $( find "$movieDir" -iname "${movieName}*720p*" ) ]] && [[ $movieQuality == "1080p" ]]; then
+      rm "$movieDir"/"$movieName"*"$movieYear"*CAM*
+    elif [[ -n $( find "$movieDir" -iname "${movieName}*${movieYear}*720p*" ) ]] && [[ $movieQuality == "1080p" ]]; then
       logWarn " Deleting 720p version to make way for $movieQuality version."
-      rm "$movieDir/$movieName"*720p*
+      rm "$movieDir"/"$movieName"*"$movieYear"*720p*
     else
       logWarn "Movie already exists."
       #logError "Error 46 [Movie Already Exists] $sortInput"
