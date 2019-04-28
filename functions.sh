@@ -372,7 +372,7 @@ function uploadDataOther {
 function seeIfExistsMovie {
   logInfo "Finding Movie..."
 
-  if [[ -n $( find "$movieDir" -iname "${movieName}*${movieYear}" ) ]]; then
+  if [[ -n $( find "$movieDir" -iname "${movieName}*${movieYear}"* ) ]]; then
     if [[ -n $( find "$movieDir" -iname "${movieName}*${movieYear}*CAM*" ) ]] && [[ $movieQuality == "720p" || $movieQuality == "1080p" ]]; then
       logWarn " Deleting CAM version to make way for $movieQuality version."
       rm "$movieDir"/"$movieName"*"$movieYear"*CAM*
