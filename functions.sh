@@ -255,6 +255,7 @@ function findMovieQuality {
 
   if [[ ${sortInput,,} =~ "dvdscr" ]] || \
     [[ ${sortInput,,} =~ "sub" ]] || \
+    [[ ${sortInput,,} =~ "blurred" ]] || \
     [[ ${sortInput,,} =~ "cam" ]] || \
     [[ ${sortInput,,} =~ "tc" ]] || \
     [[ ${sortInput,,} =~ "hc" ]]
