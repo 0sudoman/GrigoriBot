@@ -206,16 +206,17 @@ function findFolderOrFile {
 function findMovieOrTV {
   logInfo "Finding Movie/TV Status..."
 
+  inputMod=$sortInput
   for sampleFile in "$tvDir"/*; do
     if [[ "$sampleFile" =~ .{${#tvDir}}.(.*)$ ]]; then tvNameTest="${BASH_REMATCH[1]}"; fi
-    if [[ "$sampleFile" =~ .{${#tvDir}}.(.{1,17}) ]]; then sampleMod="${BASH_REMATCH[1]}"; fi
+    if [[ "$sampleFile" =~ .{${#tvDir}}.(.{1,20}) ]]; then sampleMod="${BASH_REMATCH[1]}"; fi
     sampleMod=${sampleMod/\(/} && sampleMod=${sampleMod/\)/} # remove parentheses
     sampleMod=${sampleMod//\./}    # remove dots
     sampleMod=${sampleMod/\,/}     # remove commas
     sampleMod=${sampleMod/\!/}     # remove bangs
     sampleMod=${sampleMod/\'/}     # remove apostrophes (sample)
-    inputMod=${sortInput/\'/}      # remove apostrophes (imput)
-    inputMod=${sortInput/_/}       # remove underscores
+    inputMod=${inputMod/\'/}       # remove apostrophes (imput)
+    inputMod=${inputMod/_/}        # remove underscores
     sampleMod=${sampleMod//\ /\.}  # convert spaces to dots
     if [[ "${inputMod,,}" =~ ^"${sampleMod,,}" ]]; then
       tvName="$tvNameTest"
