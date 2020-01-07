@@ -499,6 +499,9 @@ function sortTV1 {
 
 function sortTV2 {
   logInfo "Sorting Episode..."
+  if [[ $tvDate =~ "\.01\.0" ]]; then
+    mkdir "$tvDir/$tvName/Season $tvYear/"
+  fi
   if [[ $fileType == mkv ]] || [[ $fileType == mp4 ]] || [[ $fileType == avi ]]; then
     if [[ $folderOrFile == 1 ]]; then
       tvSource="$sortDir/$sortInput/$( ls -S $sortDir/$sortInput | grep $fileType | head -1 )"

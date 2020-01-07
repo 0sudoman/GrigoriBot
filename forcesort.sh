@@ -53,7 +53,7 @@ if [[ $sortError == -1 ]]; then
   elif [[ $tvStyle == 1 ]]; then
     seeIfExistsTV1
     if [[ $sortError != -1 ]]; then
-      exit
+      logInfo " Error ignored."
     fi
     sortTV1
     verifyTV1
@@ -61,7 +61,7 @@ if [[ $sortError == -1 ]]; then
   elif [[ $tvStyle == 2 ]]; then
     seeIfExistsTV2
     if [[ $sortError != -1 ]]; then
-      exit
+      logInfo " Error ignored."
     fi
     sortTV2
     verifyTV2
