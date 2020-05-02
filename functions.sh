@@ -26,8 +26,6 @@ function resetVariables {
 }
 
 function doDbQuery {
-  #logInfo "Querying Database..."
-
   #logInfo " Query Input: $dbQuery"
   dbResult="$( $dbCommand "$dbQuery" 2>/dev/null )"
   #if [[ "$dbResult" == "" ]]; then
@@ -37,6 +35,35 @@ function doDbQuery {
   #else
     #logInfo " Query Result: $dbResult"
   #fi
+}
+
+function doDbQueryP {
+  # This version tries seeral times to get a response
+  # ONLY USE WHEN A RESPONSE IS ALMOST GUARANTEED
+  dbResult="$( $dbCommand "$dbQuery" 2>/dev/null )"
+  if [[ "$dbResult" == "" ]]; then
+
+    # Fail #1
+    dbResult="$( $dbCommand "$dbQuery" 2>/dev/null )"
+    if [[ "$dbResult" == "" ]]; then
+
+      # Fail #2
+      dbResult="$( $dbCommand "$dbQuery" 2>/dev/null )"
+      if [[ "$dbResult" == "" ]]; then
+
+        # Fail #3
+        logInfo " Empty response from database."
+        pingServer
+        if [[ $sortError != -1 ]]; then
+          logWarn " Server Connect Error. Retrying in 30 seconds..."
+          sortError=-1
+          sleep 30
+          doDbQuery
+        fi
+
+      fi
+    fi
+  fi
 }
 
 # STARTUP FUNCTIONS
@@ -58,7 +85,7 @@ function getSettings {
 
   for i in sortDefault sortWaitTime; do
     dbQuery="SELECT value FROM $dbSettings WHERE setting='$i'"
-    doDbQuery
+    doDbQueryP
     declare -g $i="$dbResult"
     logInfo " $i: ${!i}"
   done
@@ -91,7 +118,7 @@ function getDbInfoID {
   logInfo "Getting ID..."
   dbQuery="SELECT id FROM $dbList WHERE sortInput=\"$sortInput\""
   id="XXXX"
-  doDbQuery
+  doDbQueryP
   id="$dbResult"
 
   if [[ "$id" != "" ]]; then
@@ -209,7 +236,7 @@ function findMovieOrTV {
   inputMod=$sortInput
   for sampleFile in "$tvDir"/*; do
     if [[ "$sampleFile" =~ .{${#tvDir}}.(.*)$ ]]; then tvNameTest="${BASH_REMATCH[1]}"; fi
-    if [[ "$sampleFile" =~ .{${#tvDir}}.(.{1,20}) ]]; then sampleMod="${BASH_REMATCH[1]}"; fi
+    if [[ "$sampleFile" =~ .{${#tvDir}}.(.{1,24}) ]]; then sampleMod="${BASH_REMATCH[1]}"; fi
     sampleMod=${sampleMod/\(/} && sampleMod=${sampleMod/\)/} # remove parentheses
     sampleMod=${sampleMod//\./}    # remove dots
     sampleMod=${sampleMod/\,/}     # remove commas
